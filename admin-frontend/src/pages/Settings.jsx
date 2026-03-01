@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Settings as SettingsIcon, Save, Loader2, DollarSign, Gauge, Check, X, Shield, Server, ArrowRight, Activity, BrainCircuit } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Loader2, DollarSign, Gauge, Check, X, Shield, Server, ArrowRight, Activity } from 'lucide-react';
 import axios from 'axios';
 
 const API = 'http://localhost:5000/api/v1';
@@ -49,7 +49,6 @@ const Settings = () => {
         basicPrice: 9,
         proPrice: 29,
         rateLimitPerMinute: 100,
-        aiModelName: 'Qwen/Qwen2.5-3B-Instruct',
         enableRegistration: true,
         enableMarketplace: true,
     });
@@ -275,19 +274,6 @@ const Settings = () => {
                             <p className="text-xs text-slate-500 mt-2 font-medium">Requests permitted per minute per tenant</p>
                         </div>
 
-                        <div className="group">
-                            <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-2">
-                                <BrainCircuit className="w-4 h-4 text-fuchsia-400" /> Default AI Model
-                            </label>
-                            <input
-                                type="text"
-                                value={settings.aiModelName}
-                                onChange={e => setSettings(s => ({ ...s, aiModelName: e.target.value }))}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm tracking-wide focus:outline-none focus:border-fuchsia-500 focus:bg-slate-900 transition-all placeholder:text-slate-600"
-                                placeholder="e.g. gpt-4-turbo"
-                            />
-                            <p className="text-xs text-slate-500 mt-2 font-medium">Primary LLM used for app generators</p>
-                        </div>
                     </div>
                 </motion.div>
             </div>

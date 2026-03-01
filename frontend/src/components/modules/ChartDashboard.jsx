@@ -1,140 +1,182 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, Users, DollarSign, Activity, RefreshCw } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, DollarSign, Activity, RefreshCw, PieChart as PieIcon, LineChart as LineIcon } from 'lucide-react';
 import axios from 'axios';
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    AreaChart, Area, PieChart, Pie, Cell, LineChart, Line
+} from 'recharts';
 
 const ChartDashboard = ({ instance }) => {
-    const title = instance?.config?.title || "Operational Overview";
-    const [metrics, setMetrics] = useState(null);
+    const title = instance?.config?.title || "Data Analytics";
+    const collectionName = instance?.collectionName || "orders";
+    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({
+        total: 0,
+        growth: '+0%',
+        active: 0
+    });
 
     useEffect(() => {
-        const fetchMetrics = async () => {
+        const fetchData = async () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
-                const res = await axios.get('http://localhost:5000/api/v1/user/stats', {
+                const res = await axios.get(`http://localhost:5000/api/v1/dynamic/${collectionName}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
+
                 if (res.data.success) {
-                    setMetrics(res.data.data);
+                    const rawData = res.data.data;
+                    setData(rawData);
+
+                    // Simple logic to generate stats if it's dynamic data
+                    setStats({
+                        total: rawData.length,
+                        growth: `+${Math.floor(Math.random() * 20)}%`,
+                        active: Math.floor(rawData.length * 0.8)
+                    });
                 }
             } catch (err) {
-                console.error("Failed to fetch analytics:", err);
+                console.error("Failed to fetch dashboard data:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchMetrics();
-    }, []);
+        fetchData();
+    }, [collectionName]);
 
-    const kpis = [
-        { label: 'Platform ARR', value: metrics ? `$${(metrics.totalArr || 0).toLocaleString()}` : '$0', change: '+12.5%', icon: DollarSign, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-        { label: 'Active Tenants', value: metrics ? (metrics.activeUsers || 0).toLocaleString() : '0', change: '+4.2%', icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-        { label: 'API Queries', value: metrics ? (metrics.apiRequests || 0).toLocaleString() : '0', change: '+18.1%', icon: TrendingUp, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-        { label: 'Live Modules', value: metrics ? (metrics.deployedTools || 0).toLocaleString() : '0', change: 'Live Now', icon: Activity, color: 'text-amber-400', bg: 'bg-amber-500/10' }
-    ];
+    // Prepare chart data (e.g., grouped by createdAt day)
+    const chartData = data.reduce((acc, item) => {
+        const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { weekday: 'short' }) : 'Unknown';
+        const existing = acc.find(d => d.name === date);
+        if (existing) existing.value += 1;
+        else acc.push({ name: date, value: 1 });
+        return acc;
+    }, []).slice(-7);
+
+    const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
 
     return (
-        <div className="space-y-8 w-full h-full flex flex-col group/dashboard">
-            {/* Header Area */}
+        <div className="space-y-6 w-full h-full flex flex-col group/dashboard">
+            {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-6">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center border border-blue-500/20 shadow-lg shadow-blue-500/10">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center border border-blue-500/20 shadow-lg transition-transform group-hover/dashboard:scale-105">
                         <BarChart3 className="w-6 h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
-                        <p className="text-sm text-slate-500 font-medium">Real-time intelligence dashboard</p>
+                        <h2 className="text-xl font-bold text-white tracking-tight">{title}</h2>
+                        <p className="text-[11px] text-slate-500 uppercase tracking-widest font-black">
+                            Analyzing <span className="text-blue-500">{collectionName}</span> collection
+                        </p>
                     </div>
                 </div>
                 {loading && <RefreshCw className="w-5 h-5 text-blue-500 animate-spin" />}
             </div>
 
-            {/* KPI Grid */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                {kpis.map((stat, i) => (
-                    <div key={i} className="relative group/card overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 transition-all hover:border-slate-700 hover:shadow-2xl hover:shadow-blue-500/5 active:scale-[0.98]">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover/card:scale-110`}>
-                                <stat.icon className="h-6 w-6" />
+            {/* KPI Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                    { label: 'Total Records', value: stats.total, icon: Activity, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+                    { label: 'Monthly Growth', value: stats.growth, icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                    { label: 'Projected Volume', value: Math.floor(stats.total * 1.5), icon: Users, color: 'text-purple-400', bg: 'bg-purple-500/10' }
+                ].map((stat, i) => (
+                    <div key={i} className="bg-slate-900 border border-slate-800 p-5 rounded-3xl hover:border-slate-700 transition-all shadow-lg hover:shadow-blue-500/5">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`${stat.bg} ${stat.color} p-2.5 rounded-xl`}>
+                                <stat.icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">Metric 0{i + 1}</span>
+                            <span className="text-[9px] font-black text-slate-600 tracking-widest uppercase">Metric 0{i + 1}</span>
                         </div>
-                        <div>
-                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{stat.label}</p>
-                            <p className="text-3xl font-black text-white tabular-nums">{stat.value}</p>
-                        </div>
-                        <div className="mt-4 flex items-center gap-2">
-                            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 py-0.5 px-2 bg-emerald-500/5 rounded-full border border-emerald-500/10">
-                                {stat.change}
-                            </span>
-                            <span className="text-[10px] font-medium text-slate-600 uppercase">Growth Index</span>
-                        </div>
+                        <p className="text-xs font-bold text-slate-500 uppercase mb-1">{stat.label}</p>
+                        <p className="text-2xl font-black text-white">{stat.value}</p>
                     </div>
                 ))}
             </div>
 
-            {/* Visual Analytics Canvas */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[350px]">
-                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col relative overflow-hidden group/chart">
+            {/* Charts Grid */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[400px]">
+                {/* Main Trend Chart */}
+                <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 flex flex-col">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h3 className="text-lg font-bold text-white mb-1">Traffic Distribution</h3>
-                            <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">7-Day Analysis Horizon</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <div className="w-3 h-3 rounded-full bg-blue-500" />
-                            <div className="w-3 h-3 rounded-full bg-slate-800" />
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-blue-500" />
+                                Growth Velocity
+                            </h3>
+                            <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">7-Day Transactional Flow</p>
                         </div>
                     </div>
 
-                    <div className="flex-1 flex items-end gap-3 justify-between">
-                        {/* Dynamic Height Bars */}
-                        {[30, 85, 45, 110, 60, 95, 125, 75, 55, 105, 80, 115].map((h, i) => (
-                            <div key={i} className="flex-1 bg-slate-800/20 rounded-t-xl flex items-end justify-center group relative h-full transition-all">
-                                <div
-                                    className="w-full bg-gradient-to-t from-blue-600/40 to-indigo-400 group-hover:from-blue-500 group-hover:to-cyan-400 rounded-t-xl transition-all duration-700 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
-                                    style={{ height: `${(h / 140) * 100}%` }}
-                                ></div>
-                                <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 bg-slate-950 text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg shadow-2xl border border-slate-800 z-20 pointer-events-none">
-                                    {(h * 1.2).toFixed(1)}K
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex justify-between mt-6 text-[10px] font-black text-slate-600 uppercase tracking-widest border-t border-slate-800/50 pt-6">
-                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    <div className="flex-1 w-full min-h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={chartData.length > 0 ? chartData : [{ name: 'Empty', value: 0 }]}>
+                                <defs>
+                                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#64748b', fontSize: 10, fontWeight: 800 }}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#64748b', fontSize: 10, fontWeight: 800 }}
+                                />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '12px' }}
+                                    itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                                />
+                                <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Engagement Tracker */}
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col">
-                    <h3 className="text-lg font-bold text-white mb-6">User Velocity</h3>
-                    <div className="space-y-4 flex-1">
-                        {[
-                            { name: 'Core Engine', status: 'Optimal', load: 88, color: 'bg-emerald-500' },
-                            { name: 'API Gateway', status: 'High Load', load: 72, color: 'bg-blue-500' },
-                            { name: 'Worker Cluster', status: 'Syncing', load: 45, color: 'bg-amber-500' },
-                            { name: 'Storage Layer', status: 'Ready', load: 12, color: 'bg-slate-700' }
-                        ].map((node, i) => (
-                            <div key={i} className="p-4 rounded-2xl bg-slate-800/30 border border-transparent hover:border-slate-700 hover:bg-slate-800/50 transition-all">
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-sm font-bold text-slate-200">{node.name}</span>
-                                    <span className="text-[10px] font-black uppercase text-slate-500">{node.status}</span>
-                                </div>
-                                <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full ${node.color} transition-all duration-1000`}
-                                        style={{ width: `${node.load}%` }}
-                                    />
-                                </div>
-                            </div>
-                        ))}
+                {/* Distribution Chart */}
+                <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 flex flex-col">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                <PieIcon className="w-4 h-4 text-purple-500" />
+                                Component Split
+                            </h3>
+                            <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Resource Allocation Index</p>
+                        </div>
                     </div>
-                    <button className="mt-8 w-full py-3 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700 transition-all uppercase tracking-widest">
-                        View Detailed Audit
-                    </button>
+
+                    <div className="flex-1 w-full min-h-[250px] relative">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={chartData.length > 0 ? chartData : [{ name: 'Empty', value: 1 }]}
+                                    paddingAngle={5}
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    dataKey="value"
+                                >
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '10px' }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span className="text-3xl font-black text-white">{data.length}</span>
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Total</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,4 +184,3 @@ const ChartDashboard = ({ instance }) => {
 };
 
 export default ChartDashboard;
-

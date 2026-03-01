@@ -67,7 +67,7 @@ const Login = () => {
                         className="mt-6 space-y-2"
                     >
                         <h1 className="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
-                        <p className="text-slate-400 text-sm font-medium">Log in to your SaaSForge control panel</p>
+                        <p className="text-slate-400 text-sm font-medium">Log in to your CodeAra control panel</p>
                     </motion.div>
                 </div>
 
@@ -102,7 +102,7 @@ const Login = () => {
                                 <input
                                     type="email"
                                     required
-                                    placeholder="admin@saasforge.ai"
+                                    placeholder="admin@codeara.com"
                                     value={form.email}
                                     onChange={e => setForm({ ...form, email: e.target.value })}
                                     className="w-full bg-black/20 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500/50 focus:bg-white/5 transition-all text-[15px] shadow-inner"

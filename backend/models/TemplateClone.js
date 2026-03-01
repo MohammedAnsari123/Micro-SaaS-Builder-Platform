@@ -31,10 +31,10 @@ const templateCloneSchema = new mongoose.Schema({
         default: null
     },
 
-    // Track if clone came from AI or gallery
+    // Track if clone came from gallery or admin
     cloneSource: {
         type: String,
-        enum: ['gallery', 'ai-generated', 'admin', 'import'],
+        enum: ['gallery', 'admin', 'import'],
         default: 'gallery'
     },
 

@@ -31,7 +31,7 @@ const Navbar = () => {
                         <Layers className="text-white w-6 h-6" />
                     </div>
                     <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                        SaaSForge<span className="text-blue-500">.ai</span>
+                        CodeAra
                     </span>
                 </Link>
 

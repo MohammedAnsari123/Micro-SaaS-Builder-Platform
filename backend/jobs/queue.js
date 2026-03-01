@@ -35,26 +35,6 @@ webhookQueue.process(async (job) => {
     return { success: true, delivered: webhooks.length };
 });
 
-// 2. AI Generation Queue 
-const aiGenerationQueue = new Bull('ai-generation', redisOptions);
-
-aiGenerationQueue.process(async (job) => {
-    const { prompt } = job.data;
-
-    try {
-        const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
-
-        // This can take 30+ seconds, but since it's in a background queue, the main Node thread is totally unblocked!
-        const response = await axios.post(`${aiServiceUrl}/api/v1/generate`, { prompt }, { timeout: 120000 });
-
-        return { success: true, data: response.data.data };
-    } catch (err) {
-        console.error("AI Generation Job Failed:", err.message);
-        throw err; // Trigger Bull's failure state
-    }
-});
-
 module.exports = {
-    webhookQueue,
-    aiGenerationQueue
+    webhookQueue
 };

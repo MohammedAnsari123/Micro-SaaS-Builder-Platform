@@ -16,35 +16,99 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @desc    Register user and create tenant
 // @route   POST /api/v1/auth/register
 // @access  Public
+const Template = require('../models/Template');
+
+// @desc    Register user and create tenant
+// @route   POST /api/v1/auth/register
+// @access  Public
 exports.register = async (req, res, next) => {
     try {
         const { name, email, password, tenantName } = req.body;
 
-        // Check if tenant exists
+        // 1. Check if tenant exists
         let tenant = await Tenant.findOne({ name: tenantName });
         if (tenant) {
             return res.status(400).json({ success: false, message: 'Tenant name already taken' });
         }
 
-        // Check if user exists
+        // 2. Check if user exists
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ success: false, message: 'Email already registered' });
         }
 
-        // Create Tenant
-        tenant = await Tenant.create({
-            name: tenantName,
-            plan: 'free'
-        });
+        // 3. Find a default template to assign
+        let defaultTemplate = await Template.findOne({ isPublic: true });
 
-        // Create User linked to Tenant
+        // If no templates exist in DB, create a minimal "Starter" template to unblock registration
+        if (!defaultTemplate) {
+            defaultTemplate = await Template.create({
+                name: 'Starter Template',
+                slug: 'starter-' + Date.now(),
+                isPublic: true,
+                layoutType: 'sidebar',
+                pages: [{ name: 'Dashboard', slug: 'dashboard', icon: 'LayoutDashboard' }]
+            });
+        }
+
+        const templateId = defaultTemplate._id;
+
+        // 4. Create User first
         user = await User.create({
             name,
             email,
             password,
-            role: 'owner', // First user is the owner
-            tenantId: tenant._id
+            role: 'owner'
+        });
+
+        // 5. Create Tenant linked to User and Template
+        tenant = await Tenant.create({
+            name: tenantName,
+            ownerId: user._id,
+            templateId: templateId,
+            plan: 'free'
+        });
+
+        // 6. Link User back to Tenant
+        user.tenantId = tenant._id;
+        await user.save({ validateBeforeSave: false });
+
+        // 7. NEW: Create a Tool instance by cloning the default template
+        const Tool = require('../models/Tool');
+        const TemplateClone = require('../models/TemplateClone');
+
+        // Create the Tool document
+        const tool = await Tool.create({
+            tenantId: tenant._id,
+            name: `${defaultTemplate.name} (Clone)`,
+            description: defaultTemplate.description,
+            currentVersion: 1,
+            category: defaultTemplate.category || 'General',
+            versions: [{
+                version: 1,
+                pages: defaultTemplate.pages ? defaultTemplate.pages.map(p => ({
+                    name: p.name,
+                    slug: p.slug,
+                    icon: p.icon,
+                    sections: p.sections || []
+                })) : [{ name: 'Dashboard', slug: 'dashboard', icon: 'LayoutDashboard', sections: [] }],
+                layoutConfig: {
+                    type: defaultTemplate.layoutType || 'sidebar',
+                    theme: defaultTemplate.colorTheme || 'blue'
+                },
+                instances: [] // Initial empty state
+            }],
+            isPublic: false
+        });
+
+        // Create the TemplateClone record pointing to the NEW Tool
+        await TemplateClone.create({
+            tenantId: tenant._id,
+            templateId: templateId,
+            toolId: tool._id,
+            templateVersion: 1,
+            cloneSource: 'gallery',
+            templateSnapshotName: defaultTemplate.name
         });
 
         sendTokenResponse(user, 201, res);

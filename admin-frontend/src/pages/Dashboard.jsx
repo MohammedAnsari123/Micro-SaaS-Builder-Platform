@@ -72,7 +72,6 @@ const Dashboard = () => {
             + `Total Tenants,${metrics.totalTenants}\n`
             + `Monthly Revenue,${metrics.monthlyRevenue}\n`
             + `Deployed Tools,${metrics.deployedTools}\n`
-            + `AI Requests,${metrics.aiRequests}\n`
             + `API Traffic Vol,${metrics.apiUsage}\n`
             + `Active Subs,${metrics.activeSubscriptions}\n`
             + `Error Logs,${metrics.errorCount}\n`;
@@ -154,7 +153,6 @@ const Dashboard = () => {
 
             {/* Metric Cards Grid 2 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <MetricCard title="AI Requests" value={m.aiRequests?.toLocaleString() || '0'} trend="45.2%" isPositive={true} icon={Bot} colorClass="from-pink-500 to-rose-500" delay={0.5} />
                 <MetricCard title="API Traffic Vol" value={m.apiUsage?.toLocaleString() || '0'} trend="18.1%" isPositive={true} icon={Activity} colorClass="from-cyan-500 to-blue-500" delay={0.6} />
                 <MetricCard title="Active Subs" value={m.activeSubscriptions?.toLocaleString() || '0'} trend="11.2%" isPositive={true} icon={TrendingUp} colorClass="from-teal-500 to-emerald-500" delay={0.7} />
                 <MetricCard title="Error Rate" value={m.errorCount?.toLocaleString() || '0'} trend="2.4%" isPositive={false} icon={AlertTriangle} colorClass="from-red-500 to-rose-500" delay={0.8} />
@@ -243,7 +241,7 @@ const Dashboard = () => {
                         {[
                             { label: 'Core API Server', status: 'Operational', color: 'bg-emerald-400', load: '12%' },
                             { label: 'MongoDB Cluster', status: 'Connected', color: 'bg-emerald-400', load: '45%' },
-                            { label: 'AI Inference Engine', status: 'High Load', color: 'bg-amber-400', load: '89%' },
+                            { label: 'Template Engine', status: 'Optimal', color: 'bg-emerald-400', load: '14%' },
                             { label: 'Redis Cache', status: 'Optimal', color: 'bg-emerald-400', load: '5%' },
                         ].map((s, i) => (
                             <div key={i} className="bg-white/5 hover:bg-white/10 transition-colors rounded-2xl p-4 flex items-center justify-between border border-white/5 group-hover:border-white/10">

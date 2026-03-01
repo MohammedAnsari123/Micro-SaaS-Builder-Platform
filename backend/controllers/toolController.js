@@ -1,118 +1,7 @@
 const Tool = require('../models/Tool');
 const { generateModel } = require('../schema-engine/generator');
-const axios = require('axios');
-const { aiGenerationQueue } = require('../jobs/queue');
 
-// Helper variable for python AI service
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000/api/v1';
 
-// @desc    Generate Tool Architecture via AI
-// @route   POST /api/v1/tools/generate
-// @access  Private
-exports.generateTool = async (req, res, next) => {
-    try {
-        const { prompt, name, description } = req.body;
-
-        if (!prompt || !name) {
-            return res.status(400).json({ success: false, message: 'Please provide a tool name and AI prompt' });
-        }
-
-        // Push generation request to Bull background worker instead of waiting synchronously
-        const job = await aiGenerationQueue.add({
-            prompt,
-            name,
-            description,
-            tenantId: req.tenantId,
-            email: req.user?.email
-        });
-
-        res.status(202).json({
-            success: true,
-            message: 'AI Generation started asynchronously.',
-            jobId: job.id
-        });
-
-    } catch (err) {
-        next(err);
-    }
-};
-
-// @desc    Check AI Generation Job Status
-// @route   GET /api/v1/tools/job/:jobId
-// @access  Private
-exports.getJobStatus = async (req, res, next) => {
-    try {
-        const job = await aiGenerationQueue.getJob(req.params.jobId);
-
-        if (!job) {
-            return res.status(404).json({ success: false, message: 'Job not found' });
-        }
-
-        const state = await job.getState();
-        const progress = job._progress;
-        const result = job.returnvalue; // Bull stores the return value of the process func here
-        const failedReason = job.failedReason;
-
-        // If the AI background job succeeded, we need to create the actual Mongo models right now before returning to client
-        if (state === 'completed' && result && !job.data.modelsGenerated) {
-            const { models, routes, ui_layout_config } = result.data;
-            const { name, description, tenantId } = job.data;
-
-            const tool = await Tool.create({
-                tenantId,
-                name,
-                description,
-                currentVersion: 1,
-                versions: [
-                    {
-                        version: 1,
-                        schemas: models.map(m => ({
-                            tableName: m.name,
-                            fields: m.fields,
-                            indexes: m.indexes
-                        })),
-                        layout: ui_layout_config
-                    }
-                ]
-            });
-
-            if (models && models.length > 0) {
-                models.forEach(modelDef => {
-                    generateModel(
-                        tenantId,
-                        modelDef.name,
-                        modelDef.fields,
-                        modelDef.indexes,
-                        job.data.email
-                    );
-                });
-            }
-
-            // Mark job as fully processed in DB so we don't recreate the Tool on subsequent polls
-            await job.update({ ...job.data, modelsGenerated: true, toolId: tool._id, routes });
-
-            return res.status(200).json({
-                success: true,
-                state,
-                data: { tool, generatedRoutes: routes }
-            });
-        }
-
-        if (state === 'completed' && job.data.modelsGenerated) {
-            // Already processed in a previous poll
-            const tool = await Tool.findById(job.data.toolId);
-            return res.status(200).json({
-                success: true,
-                state,
-                data: { tool, generatedRoutes: job.data.routes }
-            });
-        }
-
-        res.status(200).json({ success: true, state, progress, error: failedReason });
-    } catch (err) {
-        next(err);
-    }
-};
 
 // @desc    Create a new Tool manually (without AI)
 // @route   POST /api/v1/tools
@@ -207,13 +96,14 @@ exports.getToolById = async (req, res, next) => {
     }
 };
 
-// @desc    Resolve tool by Vanity URL (Name + Email Prefix)
-// @route   GET /api/v1/tools/resolve/:templateName/:emailPrefix
+// @desc    Resolve Site by Vanity URL (Template Slug + Email Prefix)
+// @route   GET /api/v1/tools/resolve/:templateSlug/:emailPrefix
 // @access  Public
-exports.resolveToolByVanity = async (req, res, next) => {
+exports.resolveSiteByVanity = async (req, res, next) => {
     try {
-        const { templateName, emailPrefix } = req.params;
+        const { templateSlug, emailPrefix } = req.params;
         const User = require('../models/User');
+        const Tenant = require('../models/Tenant');
 
         // 1. Find the user whose email starts with the prefix
         const user = await User.findOne({
@@ -221,31 +111,51 @@ exports.resolveToolByVanity = async (req, res, next) => {
         });
 
         if (!user) {
-            return res.status(404).json({ success: false, message: 'Platform owner not found for this prefix' });
+            return res.status(404).json({ success: false, message: 'Platform owner not found' });
         }
 
-        // 2. Slugify the incoming templateName to match DB format
-        const slugifiedName = templateName
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^-+|-+$/g, '');
+        // 2. Find the tenant belonging to this user
+        const tenant = await Tenant.findOne({ ownerId: user._id })
+            .populate('templateId')
+            .populate('themeId')
+            .lean();
 
-        // 3. Find the tool matching the slug and belonging to that user's tenant
+        if (!tenant) {
+            return res.status(404).json({ success: false, message: 'No tenant found for this user' });
+        }
+
+        // 3. Find the specific Tool by slug for this tenant
         const tool = await Tool.findOne({
-            slug: slugifiedName,
-            tenantId: user.tenantId
-        });
+            tenantId: tenant._id,
+            slug: templateSlug.toLowerCase()
+        }).lean();
 
-        if (!tool) {
-            return res.status(404).json({ success: false, message: `Tool with slug '${slugifiedName}' not found for user ${emailPrefix}` });
+        let responseTemplate = tenant.templateId;
+        if (tool) {
+            const latestVer = tool.versions[tool.currentVersion - 1];
+            // Normalize Tool to look like a Template for the LayoutRenderer
+            responseTemplate = {
+                ...tool,
+                pages: latestVer.pages || [],
+                instances: latestVer.instances || [],
+                layoutType: latestVer.layoutConfig?.layoutType || tenant.templateId?.layoutType || 'sidebar',
+                schemaConfig: { tables: latestVer.schemas || [] }
+            };
+        }
+
+        if (!responseTemplate) {
+            return res.status(404).json({ success: false, message: 'Requested application structure not found.' });
         }
 
         res.status(200).json({
             success: true,
-            data: tool
+            data: {
+                tenantName: tenant.name,
+                template: responseTemplate,
+                theme: tenant.themeId,
+                tools: tenant.enabledTools,
+                plan: tenant.subscriptionPlan
+            }
         });
 
     } catch (err) {

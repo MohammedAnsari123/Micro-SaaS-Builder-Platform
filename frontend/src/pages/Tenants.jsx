@@ -98,7 +98,7 @@ const Tenants = () => {
                         <Layers className="w-4 h-4" /> Browse Templates
                     </Link>
                     <Link to="/builder/new" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
-                        <Plus className="w-4 h-4" /> New AI Agent
+                        <Plus className="w-4 h-4" /> New App
                     </Link>
                 </div>
             </div>
@@ -154,7 +154,7 @@ const Tenants = () => {
                             <Globe className="w-8 h-8 text-slate-600" />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">No websites yet</h3>
-                        <p className="text-slate-500 text-sm mb-6 max-w-xs mx-auto">Clone a template from the gallery or build one with AI to get started.</p>
+                        <p className="text-slate-500 text-sm mb-6 max-w-xs mx-auto">Clone a template from the gallery or build a custom app to get started.</p>
                         <Link to="/templates" className="inline-flex items-center gap-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-6 py-2.5 rounded-xl font-bold border border-blue-500/20 transition-all">
                             <Layers className="w-4 h-4" /> Browse Templates
                         </Link>
@@ -215,7 +215,7 @@ const Tenants = () => {
                                         <div className="flex flex-wrap gap-1.5 mb-4">
                                             {app.pages.slice(0, 4).map((page, j) => (
                                                 <span key={j} className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md border border-white/5">
-                                                    {page}
+                                                    {page.name || page}
                                                 </span>
                                             ))}
                                             {app.pages.length > 4 && (

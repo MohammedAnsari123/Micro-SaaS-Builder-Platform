@@ -21,7 +21,12 @@ const ToolVersionSchema = new mongoose.Schema({
     layoutConfig: { type: mongoose.Schema.Types.Mixed, default: {} }, // Global sidebar, nav, branding
 
     // Generated Modules
-    pages: [{ type: String }], // Array of active page names e.g. ["Dashboard", "Contacts"]
+    pages: [{
+        name: { type: String, required: true },
+        slug: { type: String, required: true },
+        icon: { type: String },
+        sections: [{ type: String }] // Array of tool slugs
+    }],
     instances: [{
         moduleType: String, // String representation e.g. 'crud_table', 'kanban_board', 'custom' 
         moduleSlug: String,
@@ -36,8 +41,7 @@ const toolSchema = new mongoose.Schema({
     tenantId: {
         type: mongoose.Schema.ObjectId,
         ref: 'Tenant',
-        required: true,
-        index: true // Important for tenant isolation queries
+        required: true
     },
     name: {
         type: String,
@@ -47,72 +51,63 @@ const toolSchema = new mongoose.Schema({
     },
     slug: {
         type: String,
-        index: true
+        required: true,
+        unique: false,
+        trim: true,
+        lowercase: true
+    },
+    category: {
+        type: String,
+        required: true,
+        trim: true
     },
     description: {
         type: String,
         maxlength: [500, 'Description cannot be more than 500 characters']
     },
-    currentVersion: {
-        type: Number,
-        default: 1
-    },
-    versions: [ToolVersionSchema],
-    // Marketplace & Ecosystem Fields
     isPublic: {
         type: Boolean,
-        default: false,
-        index: true
-    },
-    isPremium: {
-        type: Boolean,
-        default: false,
-        index: true
+        default: false
     },
     price: {
         type: Number,
-        default: 0, // Price in cents. 0 = Free
-        min: 0
+        default: 0
     },
-    category: {
-        type: String,
-        trim: true
-    },
-    tags: [{
-        type: String,
-        trim: true
-    }],
     clonesCount: {
         type: Number,
         default: 0
     },
     rating: {
         type: Number,
-        default: 0,
-        min: 0,
-        max: 5
+        default: 5.0
     },
     reviewsCount: {
         type: Number,
         default: 0
     },
+    tags: [{
+        type: String
+    }],
+    currentVersion: {
+        type: Number,
+        default: 1
+    },
+    versions: [ToolVersionSchema],
     createdAt: {
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: true
 });
 
-// Compound index for rendering a tenant's specific tools quickly
-toolSchema.index({ tenantId: 1, createdAt: -1 });
+// Ensure (Tenant + Slug) is unique, AND allow (Public + Slug) uniqueness for Marketplace
+toolSchema.index({ tenantId: 1, slug: 1 }, { unique: true });
+toolSchema.index({ slug: 1, isPublic: 1 }, { unique: true, partialFilterExpression: { isPublic: true } });
 
-// Compound index for filtering the public Marketplace
-toolSchema.index({ isPublic: 1, category: 1, rating: -1 });
-
-// Text index for Marketplace search query optimization
-toolSchema.index({ name: 'text', description: 'text', tags: 'text' });
-
-toolSchema.pre('save', async function () {
-    if ((this.isModified('name') || !this.slug) && this.name) {
+// Auto-generate slug if not provided (pre-save hook already exists in logic usually, but I'll simplify)
+toolSchema.pre('validate', function (next) {
+    if (!this.slug && this.name) {
         this.slug = this.name
             .toLowerCase()
             .trim()
@@ -121,6 +116,7 @@ toolSchema.pre('save', async function () {
             .replace(/-+/g, '-')
             .replace(/^-+|-+$/g, '');
     }
+    next();
 });
 
 module.exports = mongoose.model('Tool', toolSchema);

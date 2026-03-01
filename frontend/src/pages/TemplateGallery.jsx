@@ -100,10 +100,10 @@ const TemplateGallery = () => {
                                         </div>
                                         <div className="absolute bottom-3 left-3 flex gap-2">
                                             <span className={`px-2 py-1 rounded bg-black/40 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white/90`}>
-                                                {Object.keys(template.schemaConfig || {}).length} Collections
+                                                {template.defaultTools?.length || 0} Collections
                                             </span>
                                             <span className={`px-2 py-1 rounded bg-black/40 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white/90`}>
-                                                {template.defaultPages?.length || 0} Pages
+                                                {template.pages?.length || 0} Pages
                                             </span>
                                         </div>
                                     </div>

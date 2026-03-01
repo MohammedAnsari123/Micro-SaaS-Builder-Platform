@@ -170,9 +170,18 @@ const Builder = () => {
 
                 if (res.data.success) {
                     setTool(res.data.data);
-                    const pages = res.data.data.versions[res.data.data.currentVersion - 1]?.pages || [];
-                    if (pages.length > 0 && !pages.includes('Dashboard')) {
-                        setActivePage(pages[0]);
+                    const rawPages = res.data.data.versions[res.data.data.currentVersion - 1]?.pages || [];
+
+                    // Normalize pages to objects
+                    const normalizedPages = rawPages.map(p => {
+                        if (typeof p === 'object' && p !== null) return p;
+                        return { name: String(p), slug: String(p).toLowerCase().replace(/\s+/g, '-'), icon: 'LayoutDashboard', sections: [] };
+                    });
+
+                    if (normalizedPages.length > 0) {
+                        const firstPage = normalizedPages[0];
+                        const dashboardPage = normalizedPages.find(p => p.name === 'Dashboard' || p.slug === 'dashboard');
+                        setActivePage(dashboardPage ? dashboardPage.name : firstPage.name);
                     }
                 }
             } catch (err) {
@@ -291,15 +300,24 @@ const Builder = () => {
         const pageName = newPageName.trim();
 
         const currentVer = tool.versions[tool.currentVersion - 1];
-        if (currentVer.pages.includes(pageName)) {
+        const normalizedExistingPages = currentVer.pages.map(p => typeof p === 'object' ? p.name : p);
+
+        if (normalizedExistingPages.includes(pageName)) {
             alert(`Page "${pageName}" already exists!`);
             return;
         }
 
+        const newPageObj = {
+            name: pageName,
+            slug: pageName.toLowerCase().replace(/\s+/g, '-'),
+            icon: 'LayoutDashboard',
+            sections: []
+        };
+
         const updatedTool = { ...tool };
         updatedTool.versions[tool.currentVersion - 1] = {
             ...currentVer,
-            pages: [...currentVer.pages, pageName]
+            pages: [...currentVer.pages, newPageObj]
         };
 
         setTool(updatedTool);
@@ -317,7 +335,7 @@ const Builder = () => {
         if (!confirm(`Delete page "${pageName}" and all its components?`)) return;
 
         const currentVer = tool.versions[tool.currentVersion - 1];
-        const updatedPages = currentVer.pages.filter(p => p !== pageName);
+        const updatedPages = currentVer.pages.filter(p => (typeof p === 'object' ? p.name : p) !== pageName);
         const updatedInstances = (currentVer.instances || []).filter(inst => inst.pageName !== pageName);
 
         const updatedTool = { ...tool };
@@ -499,26 +517,31 @@ const Builder = () => {
                     </AnimatePresence>
 
                     <div className="space-y-1">
-                        {pages.map(page => (
-                            <div key={page} className="group flex items-center gap-1">
-                                <button
-                                    onClick={() => setActivePage(page)}
-                                    className={`flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${activePage === page ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'}`}
-                                >
-                                    <LayoutDashboard className={`w-4 h-4 ${activePage === page ? 'text-brand-400' : 'text-slate-500'}`} />
-                                    {page}
-                                </button>
-                                {pages.length > 1 && (
+                        {pages.map(page => {
+                            const pName = typeof page === 'object' ? page.name : page;
+                            const pSlug = typeof page === 'object' ? page.slug : page;
+
+                            return (
+                                <div key={pSlug} className="group flex items-center gap-1">
                                     <button
-                                        onClick={() => handleDeletePage(page)}
-                                        className="p-1.5 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all rounded"
-                                        title={`Delete ${page}`}
+                                        onClick={() => setActivePage(pName)}
+                                        className={`flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${activePage === pName ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'}`}
                                     >
-                                        <Trash2 className="w-3.5 h-3.5" />
+                                        <LayoutDashboard className={`w-4 h-4 ${activePage === pName ? 'text-brand-400' : 'text-slate-500'}`} />
+                                        {pName}
                                     </button>
-                                )}
-                            </div>
-                        ))}
+                                    {pages.length > 1 && (
+                                        <button
+                                            onClick={() => handleDeletePage(pName)}
+                                            className="p-1.5 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all rounded"
+                                            title={`Delete ${pName}`}
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
 
                     <div className="flex items-center justify-between mb-4 mt-8">

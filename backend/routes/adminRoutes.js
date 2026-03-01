@@ -14,7 +14,6 @@ const {
     approveMarketplaceItem,
     rejectMarketplaceItem,
     getBilling,
-    getAIMonitor,
     getAnalytics,
     getSecurity,
     getSettings,
@@ -39,7 +38,7 @@ router.get('/marketplace', getMarketplaceItems);
 router.put('/marketplace/:id/approve', approveMarketplaceItem);
 router.put('/marketplace/:id/reject', rejectMarketplaceItem);
 router.get('/billing', getBilling);
-router.get('/ai-monitor', getAIMonitor);
+
 router.get('/analytics', getAnalytics);
 router.get('/security', getSecurity);
 router.get('/settings', getSettings);

@@ -13,7 +13,6 @@ const navItems = [
     { path: '/templates', label: 'Templates', icon: LayoutTemplate },
     { path: '/marketplace', label: 'Marketplace', icon: Store },
     { path: '/billing', label: 'Billing', icon: CreditCard },
-    { path: '/ai-monitor', label: 'AI Engine', icon: Bot },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/security', label: 'Security', icon: Shield },
     { path: '/settings', label: 'Settings', icon: Settings },

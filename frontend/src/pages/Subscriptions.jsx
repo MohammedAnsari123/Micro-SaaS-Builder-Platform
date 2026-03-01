@@ -46,7 +46,7 @@ const Subscriptions = () => {
                         <Zap className="w-3 h-3" /> Free Tier Active
                     </div>
                     <h2 className="text-4xl font-bold text-white tracking-tight mb-4 leading-[1.1]">Infrastructure <br /><span className="text-slate-500 italic">Subscription Control</span></h2>
-                    <p className="text-slate-400 font-medium max-w-md leading-relaxed">Scaling your SaaS portfolio is easy. Upgrade to remove usage limits and unlock premium AI features.</p>
+                    <p className="text-slate-400 font-medium max-w-md leading-relaxed">Scaling your SaaS portfolio is easy. Upgrade to remove usage limits and unlock premium infrastructure features.</p>
                 </div>
                 <div className="bg-slate-800/80 border border-white/5 p-8 rounded-3xl w-full md:w-80 backdrop-blur-xl relative z-10">
                     <div className="flex items-center gap-4 mb-6">
@@ -75,18 +75,18 @@ const Subscriptions = () => {
                     name="Starter"
                     price="0"
                     current={true}
-                    features={['3 SaaS App Slots', '50 MB Data Storage', 'Community Support', 'Standard AI Engine']}
+                    features={['3 SaaS App Slots', '50 MB Data Storage', 'Community Support', 'Standard Build Engine']}
                 />
                 <PlanCard
                     name="Pro Scaler"
                     price="29"
                     recommended={true}
-                    features={['Unlimited App Slots', '5 GB Managed Storage', 'Priority AI Queue', 'White-label Branding', 'Advanced Analytics']}
+                    features={['Unlimited App Slots', '5 GB Managed Storage', 'Priority Build Queue', 'White-label Branding', 'Advanced Analytics']}
                 />
                 <PlanCard
                     name="Enterprise"
                     price="199"
-                    features={['Multi-tenant Reseller', '100 GB Storage', 'Dedicated GPU Node', 'Custom AI Fine-tuning', '24/7 Human Support']}
+                    features={['Multi-tenant Reseller', '100 GB Storage', 'Dedicated Clusters', 'Custom Architecture Review', '24/7 Human Support']}
                 />
             </div>
 

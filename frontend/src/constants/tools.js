@@ -45,14 +45,5 @@ export const TOOLS = [
         color: '#EF4444', // Red
         position: [-1.5, -2, 0.1],
         delay: 0.8,
-    },
-    {
-        id: 'ai',
-        label: 'AI Engine',
-        feature: 'LLM Integration',
-        icon: Bot,
-        color: '#EC4899', // Pink
-        position: [1.5, -2, 0.1],
-        delay: 1.0,
     }
 ];

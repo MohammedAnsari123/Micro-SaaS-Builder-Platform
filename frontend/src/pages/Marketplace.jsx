@@ -75,7 +75,7 @@ const Marketplace = () => {
                         <Layers className="w-4 h-4" /> Browse Templates
                     </Link>
                     <Link to="/builder/new" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
-                        <Plus className="w-4 h-4" /> Build with AI
+                        <Plus className="w-4 h-4" /> Build New App
                     </Link>
                 </div>
             </div>
@@ -168,7 +168,7 @@ const Marketplace = () => {
                                         <div className="flex flex-wrap gap-1.5 mb-4">
                                             {site.pages.slice(0, 4).map((page, j) => (
                                                 <span key={j} className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md border border-white/5">
-                                                    {page}
+                                                    {page.name || page}
                                                 </span>
                                             ))}
                                             {site.pages.length > 4 && (

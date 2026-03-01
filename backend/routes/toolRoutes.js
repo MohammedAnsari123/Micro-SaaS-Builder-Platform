@@ -3,15 +3,13 @@ const { protect } = require('../middlewares/auth');
 const Template = require('../models/Template');
 
 // Import controller methods
-const { generateTool, createTool, getTools, getToolById, updateTool, getJobStatus, resolveToolByVanity } = require('../controllers/toolController');
+const { createTool, getTools, getToolById, updateTool, resolveSiteByVanity } = require('../controllers/toolController');
 
 const router = express.Router();
 
-router.post('/generate', protect, generateTool);
-router.get('/job/:jobId', protect, getJobStatus);
 router.post('/', protect, createTool);
 router.get('/', protect, getTools);
-router.get('/resolve/:templateName/:emailPrefix', resolveToolByVanity);
+router.get('/resolve/:templateSlug/:emailPrefix', resolveSiteByVanity);
 
 // Fetch all available templates as modules
 router.get('/modules', protect, async (req, res) => {

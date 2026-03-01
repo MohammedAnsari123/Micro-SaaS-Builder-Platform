@@ -15,6 +15,9 @@ const SchemaMetaSchema = new mongoose.Schema({
 });
 
 const templateSchema = new mongoose.Schema({
+    schemaConfig: {
+        tables: [SchemaMetaSchema]
+    },
     name: {
         type: String,
         required: [true, 'Please provide a template name'],
@@ -28,39 +31,52 @@ const templateSchema = new mongoose.Schema({
         trim: true,
         lowercase: true
     },
+    category: {
+        type: String,
+        trim: true,
+        default: 'General'
+    },
     description: {
         type: String,
         maxlength: [500, 'Description cannot be more than 500 characters']
     },
+    layoutType: {
+        type: String,
+        enum: ['sidebar', 'navbar', 'hybrid'],
+        default: 'sidebar'
+    },
+    themeId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Theme'
+    },
+    pages: [{
+        name: { type: String, required: true },
+        slug: { type: String, required: true },
+        icon: { type: String }, // Lucide icon name
+        sections: [{ type: String }] // Array of tool slugs or section names
+    }],
+    defaultTools: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Tool'
+    }],
+    version: {
+        type: Number,
+        default: 1
+    },
     colorTheme: {
         type: String,
-        default: 'indigo'
+        default: 'blue'
     },
-    // Blueprint Configuration
-    schemaConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
-    layoutJSON: { type: mongoose.Schema.Types.Mixed, default: {} },
-    routeConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
-    defaultPages: [{ type: mongoose.Schema.Types.Mixed }],
-    sampleData: { type: mongoose.Schema.Types.Mixed, default: {} },
-
-    // Future Marketplace
-    previewImages: [{ type: String }],
-    isPublic: { type: Boolean, default: true },
-    isPremium: { type: Boolean, default: false },
-    price: { type: Number, default: 0 },
-    creatorId: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Tenant',
-        default: null
+    isPublic: {
+        type: Boolean,
+        default: true
     },
-    revenueShare: { type: Number, default: 0.3 },
-    clonesCount: { type: Number, default: 0 },
-    category: { type: String, trim: true, default: 'General' },
-    tags: [{ type: String, trim: true }],
     createdAt: {
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 // Performance index for rapid slug lookup on public Gallery queries

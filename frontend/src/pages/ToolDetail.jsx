@@ -161,7 +161,8 @@ const ToolDetail = () => {
             // Set the default preview page to the first page
             const latestVersion = res.data.data.versions[res.data.data.versions.length - 1];
             if (latestVersion && latestVersion.pages && latestVersion.pages.length > 0) {
-                setPreviewPage(latestVersion.pages[0]);
+                const firstPage = latestVersion.pages[0];
+                setPreviewPage(typeof firstPage === 'object' ? firstPage.name : firstPage);
             }
         } catch (error) {
             console.error("Error fetching tool details", error);
@@ -397,19 +398,24 @@ const ToolDetail = () => {
                     {/* Page Tabs */}
                     {pages.length > 0 && (
                         <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1.5 rounded-2xl mb-6 overflow-x-auto">
-                            {pages.map(page => (
-                                <button
-                                    key={page}
-                                    onClick={() => setPreviewPage(page)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${previewPage === page
-                                        ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20 shadow-inner'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
-                                        }`}
-                                >
-                                    <LayoutDashboard className={`w-3.5 h-3.5 ${previewPage === page ? 'text-blue-400' : 'text-slate-500'}`} />
-                                    {page}
-                                </button>
-                            ))}
+                            {pages.map(page => {
+                                const pName = typeof page === 'object' ? page.name : page;
+                                const pSlug = typeof page === 'object' ? page.slug : page;
+
+                                return (
+                                    <button
+                                        key={pSlug}
+                                        onClick={() => setPreviewPage(pName)}
+                                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${previewPage === pName
+                                            ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20 shadow-inner'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                                            }`}
+                                    >
+                                        <LayoutDashboard className={`w-3.5 h-3.5 ${previewPage === pName ? 'text-blue-400' : 'text-slate-500'}`} />
+                                        {pName}
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
 

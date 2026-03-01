@@ -8,7 +8,6 @@ import Tenants from './pages/Tenants';
 import Templates from './pages/Templates';
 import Marketplace from './pages/Marketplace';
 import Billing from './pages/Billing';
-import AIMonitor from './pages/AIMonitor';
 import Analytics from './pages/Analytics';
 import Security from './pages/Security';
 import Settings from './pages/Settings';
@@ -26,7 +25,6 @@ function App() {
         <Route path="templates" element={<Templates />} />
         <Route path="marketplace" element={<Marketplace />} />
         <Route path="billing" element={<Billing />} />
-        <Route path="ai-monitor" element={<AIMonitor />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="security" element={<Security />} />
         <Route path="settings" element={<Settings />} />

@@ -45,8 +45,7 @@ exports.getDashboardMetrics = async (req, res, next) => {
         const monthlyRevenueRaw = (paidTenants * settings.proPrice) + (basicTenants * settings.basicPrice);
         const monthlyRevenue = `$${monthlyRevenueRaw} `;
 
-        // AI requests (using the new url field in Log)
-        const aiRequests = await Log.countDocuments({ url: { $regex: /generate|ai/i } });
+
 
         // Error count
         const errorCount = await Log.countDocuments({ status: { $gte: 400 } });
@@ -75,7 +74,6 @@ exports.getDashboardMetrics = async (req, res, next) => {
                 activeSubscriptions,
                 apiUsage,
                 monthlyRevenue,
-                aiRequests,
                 errorCount,
                 apiTraffic
             }
@@ -309,36 +307,7 @@ exports.getBilling = async (req, res, next) => {
     }
 };
 
-// @desc    AI Monitor data
-// @route   GET /api/v1/admin/ai-monitor
-exports.getAIMonitor = async (req, res, next) => {
-    try {
-        const totalCalls = await Log.countDocuments({ url: { $regex: /generate|ai/i } });
-        const failedCalls = await Log.countDocuments({ url: { $regex: /generate|ai/i }, status: { $gte: 400 } });
-        const recentLogs = await Log.find({ url: { $regex: /generate|ai/i } })
-            .sort('-timestamp')
-            .limit(10);
 
-        const enrichedLogs = recentLogs.map(l => ({
-            prompt: l.url, // Proxied for security, or extract from body if available
-            success: l.status < 400,
-            date: l.timestamp
-        }));
-
-        res.status(200).json({
-            success: true,
-            data: {
-                totalCalls,
-                failedCalls,
-                avgTokens: 2048,
-                recentLogs: enrichedLogs
-            }
-        });
-    } catch (err) {
-        if (typeof next === 'function') next(err);
-        else res.status(500).json({ success: false, message: err.message });
-    }
-};
 
 // @desc    Analytics data
 // @route   GET /api/v1/admin/analytics

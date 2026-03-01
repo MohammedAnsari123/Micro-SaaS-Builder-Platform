@@ -35,17 +35,21 @@ const AppContent = () => {
   const location = useLocation();
   const lenisRef = useRef(null);
 
+  // Disable Lenis on dashboard routes AND the landing page (/ uses GSAP ScrollTrigger pinning)
+  const isLandingPage = location.pathname === '/';
   const isDashboard = location.pathname.startsWith('/dashboard') ||
     location.pathname.startsWith('/tenants') ||
     location.pathname.startsWith('/analytics') ||
     location.pathname.startsWith('/subscriptions') ||
     location.pathname.startsWith('/settings') ||
     location.pathname.startsWith('/marketplace') ||
-    location.pathname.startsWith('/builder');
+    location.pathname.startsWith('/builder') ||
+    location.pathname.startsWith('/site');
+  const disableLenis = isDashboard || isLandingPage;
 
   // Initialize/Destroy Lenis based on route
   useEffect(() => {
-    if (isDashboard) {
+    if (disableLenis) {
       if (lenisRef.current) {
         lenisRef.current.destroy();
         lenisRef.current = null;
@@ -80,7 +84,7 @@ const AppContent = () => {
         lenisRef.current = null;
       }
     };
-  }, [isDashboard]);
+  }, [disableLenis]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-white font-sans selection:bg-blue-500/30">

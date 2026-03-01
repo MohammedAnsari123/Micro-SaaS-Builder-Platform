@@ -68,25 +68,34 @@ exports.cloneTemplate = async (req, res, next) => {
             }
         }
 
-        // 2. Build instances from defaultPages
+        // 2. Build instances from pages (previously defaultPages)
         const generatedInstances = [];
-        if (template.defaultPages && template.defaultPages.length > 0) {
-            for (const page of template.defaultPages) {
+        const sourcePages = template.pages || [];
+
+        if (sourcePages.length > 0) {
+            for (const page of sourcePages) {
                 const safeName = String(page.name || 'Page');
+                const firstSection = page.sections && page.sections.length > 0 ? page.sections[0] : 'crud_table';
+
                 generatedInstances.push({
-                    moduleType: page.type || 'crud_table',
-                    moduleSlug: page.type || 'crud_table',
+                    moduleType: firstSection,
+                    moduleSlug: firstSection,
                     pageName: safeName,
-                    collectionName: page.collection ? String(page.collection).toLowerCase() : safeName.toLowerCase().replace(/ /g, '_'),
-                    config: page.config || {}
+                    collectionName: page.slug || safeName.toLowerCase().replace(/ /g, '_'),
+                    config: {}
                 });
             }
         }
 
         // 3. Create a pristine new Tool instance under the logged in Tenant
-        const pageNames = template.defaultPages
-            ? template.defaultPages.map(p => p.name || 'Page')
-            : ['Dashboard'];
+        const toolPages = sourcePages.length > 0
+            ? sourcePages.map(p => ({
+                name: p.name,
+                slug: p.slug,
+                icon: p.icon,
+                sections: p.sections || []
+            }))
+            : [{ name: 'Dashboard', slug: 'dashboard', icon: 'LayoutDashboard', sections: [] }];
 
         const tool = await Tool.create({
             tenantId: req.tenantId,
@@ -94,12 +103,16 @@ exports.cloneTemplate = async (req, res, next) => {
             description: template.description,
             currentVersion: 1,
             category: template.category || template.slug,
+            layoutType: template.layoutType || 'sidebar',
             versions: [
                 {
                     version: 1,
                     schemas: schemaArray,
-                    layoutConfig: template.layoutJSON || {},
-                    pages: pageNames,
+                    layoutConfig: {
+                        type: template.layoutType || 'sidebar',
+                        theme: template.colorTheme || 'blue'
+                    },
+                    pages: toolPages,
                     instances: generatedInstances
                 }
             ]
