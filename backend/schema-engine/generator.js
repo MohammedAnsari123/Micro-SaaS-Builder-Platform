@@ -9,7 +9,7 @@ const dynamicModels = {};
  */
 const sanitizeEmail = (email) => {
     if (!email) return 'default';
-    return email.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
 };
 
 // Helper to map string types to Mongoose types
@@ -32,14 +32,20 @@ const getType = (typeString) => {
  * @param {Array} fields - Array of field definitions { name, type, required, unique }
  * @param {Array} indexes - Array of field names to index
  * @param {string} email - The email of the tenant owner for naming convention
+ * @param {mongoose.Connection} tenantConnection - Optional tenant-specific DB connection
  * @returns {Model} Mongoose Model
  */
-const generateModel = (tenantId, collectionName, fields, indexes = [], email = '') => {
-    // New Naming Convention: email_tenantID_collectionName
-    const sanitizedEmail = sanitizeEmail(email);
-    const modelName = `${sanitizedEmail}_${tenantId}_${collectionName}`;
+const generateModel = (tenantId, collectionName, fields, indexes = [], email = '', tenantConnection = null) => {
+    // New naming: If tenant connection is provided, collection is isolated so we just use collectionName.
+    // If fallback global connection is used, use the sanitized email prefix to avoid collisions.
+    let modelName = collectionName;
+    if (!tenantConnection) {
+        const sanitizedEmail = sanitizeEmail(email);
+        modelName = `${sanitizedEmail}_${collectionName}`;
+    }
 
-    if (dynamicModels[modelName]) {
+    if (dynamicModels[modelName] && !tenantConnection) {
+        // Only return cached model if using global connection (tenant connections are cached differently)
         return dynamicModels[modelName];
     }
 
@@ -72,13 +78,24 @@ const generateModel = (tenantId, collectionName, fields, indexes = [], email = '
 
     // Compile model
     try {
-        // Avoid "OverwriteModelError" if model already exists
-        if (mongoose.models[modelName]) {
-            dynamicModels[modelName] = mongoose.models[modelName];
+        if (tenantConnection) {
+            // Check if model exists on the tenant connection
+            if (tenantConnection.models[modelName]) {
+                return tenantConnection.models[modelName];
+            } else {
+                const model = tenantConnection.model(modelName, dynamicSchema);
+                console.log(`[SchemaEngine] Compiled model ${modelName} on Tenant DB`);
+                return model;
+            }
         } else {
-            dynamicModels[modelName] = mongoose.model(modelName, dynamicSchema);
+            // Avoid "OverwriteModelError" if model already exists on global connection
+            if (mongoose.models[modelName]) {
+                dynamicModels[modelName] = mongoose.models[modelName];
+            } else {
+                dynamicModels[modelName] = mongoose.model(modelName, dynamicSchema);
+            }
+            console.log(`[SchemaEngine] Compiled model: ${modelName} on Global DB`);
         }
-        console.log(`[SchemaEngine] Compiled model: ${modelName}`);
     } catch (err) {
         console.error(`Error compiling dynamic model ${modelName}:`, err);
         throw err;

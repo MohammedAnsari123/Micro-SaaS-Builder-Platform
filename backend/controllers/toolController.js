@@ -1,5 +1,6 @@
 const Tool = require('../models/Tool');
 const { generateModel } = require('../schema-engine/generator');
+const { getTenantConnection } = require('../config/tenantDb');
 
 
 
@@ -10,11 +11,15 @@ exports.createTool = async (req, res, next) => {
     try {
         const { name, description, schemas, layout } = req.body;
 
+        const sanitizedEmail = req.user?.email ? req.user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() : 'default';
+        const dbName = `codeara_${sanitizedEmail}`;
+
         const tool = await Tool.create({
             tenantId: req.tenantId,
             name,
             description,
             currentVersion: 1,
+            dbName,
             versions: [
                 {
                     version: 1,
@@ -25,15 +30,21 @@ exports.createTool = async (req, res, next) => {
         });
 
         if (schemas && schemas.length > 0) {
-            schemas.forEach(schemaDef => {
-                generateModel(
-                    req.tenantId,
-                    schemaDef.tableName,
-                    schemaDef.fields,
-                    schemaDef.indexes,
-                    req.user?.email
-                );
-            });
+            try {
+                const tenantConnection = await getTenantConnection(sanitizedEmail);
+                schemas.forEach(schemaDef => {
+                    generateModel(
+                        req.tenantId,
+                        schemaDef.tableName,
+                        schemaDef.fields,
+                        schemaDef.indexes,
+                        req.user?.email,
+                        tenantConnection
+                    );
+                });
+            } catch (dbErr) {
+                console.error("Failed to provision manual tool DB collections:", dbErr);
+            }
         }
 
         res.status(201).json({
@@ -177,7 +188,17 @@ exports.updateTool = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Tool not found' });
         }
 
-        if (name) tool.name = name;
+        if (name) {
+            tool.name = name;
+            // Automatically update the slug when the name changes so vanity URLs are dynamic
+            tool.slug = name
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
         if (description) tool.description = description;
         if (isPublic !== undefined) tool.isPublic = isPublic;
 

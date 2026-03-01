@@ -1,5 +1,6 @@
 const Template = require('../models/Template');
 const TemplateClone = require('../models/TemplateClone');
+const { getTenantConnection } = require('../config/tenantDb');
 const Tool = require('../models/Tool');
 const { generateModel } = require('../schema-engine/generator');
 
@@ -97,6 +98,9 @@ exports.cloneTemplate = async (req, res, next) => {
             }))
             : [{ name: 'Dashboard', slug: 'dashboard', icon: 'LayoutDashboard', sections: [] }];
 
+        const sanitizedEmail = req.user?.email ? req.user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() : 'default';
+        const dbName = `codeara_${sanitizedEmail}`;
+
         const tool = await Tool.create({
             tenantId: req.tenantId,
             name: `${template.name} (Clone)`,
@@ -104,6 +108,7 @@ exports.cloneTemplate = async (req, res, next) => {
             currentVersion: 1,
             category: template.category || template.slug,
             layoutType: template.layoutType || 'sidebar',
+            dbName: dbName, // Store DB reference
             versions: [
                 {
                     version: 1,
@@ -118,17 +123,23 @@ exports.cloneTemplate = async (req, res, next) => {
             ]
         });
 
-        // 4. Generate the actual MongoDB Collections physically via the schema-engine
+        // 4. Generate the actual MongoDB Collections physically via the schema-engine in the isolated Tenant DB
         if (schemaArray.length > 0) {
-            schemaArray.forEach(schemaDef => {
-                generateModel(
-                    req.tenantId,
-                    schemaDef.tableName,
-                    schemaDef.fields,
-                    schemaDef.indexes,
-                    req.user?.email
-                );
-            });
+            try {
+                const tenantConnection = await getTenantConnection(sanitizedEmail);
+                schemaArray.forEach(schemaDef => {
+                    generateModel(
+                        req.tenantId,
+                        schemaDef.tableName,
+                        schemaDef.fields,
+                        schemaDef.indexes,
+                        req.user?.email,
+                        tenantConnection
+                    );
+                });
+            } catch (dbErr) {
+                console.error("Failed to provision tenant DB collections:", dbErr);
+            }
         }
 
         // 5. Save TemplateClone record for tracking

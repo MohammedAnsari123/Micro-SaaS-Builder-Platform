@@ -3,6 +3,7 @@ const { protect } = require('../middlewares/auth');
 const { enforceUsageLimits } = require('../middlewares/usage');
 const { trackAnalytics } = require('../middlewares/analytics');
 const mongoose = require('mongoose');
+const { getTenantConnection } = require('../config/tenantDb');
 
 // Import controller methods
 const {
@@ -18,55 +19,65 @@ const {
 const router = express.Router({ mergeParams: true });
 
 // We need a custom middleware here because router params can't be used easily in standard middleware definitions at mount time.
-const loadDynamicModel = (req, res, next) => {
+const loadDynamicModel = async (req, res, next) => {
     const collectionName = req.params.collectionName;
     if (!collectionName) {
         return res.status(400).json({ success: false, message: 'Collection name is required' });
     }
 
-    // New Naming Convention: sanitizedEmail_tenantID_collectionName
-    const sanitizeEmail = (email) => {
-        if (!email) return 'default';
-        return email.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-    };
+    try {
+        const sanitizeEmail = (email) => {
+            if (!email) return 'default';
+            return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        };
+        const sanitizedEmail = sanitizeEmail(req.user?.email);
 
-    const sanitizedEmail = sanitizeEmail(req.user?.email);
-    const modelName = `${sanitizedEmail}_${req.tenantId}_${collectionName}`;
-    let Model = mongoose.models[modelName];
+        // 1. Get isolated tenant database connection using sanitized email
+        const tenantConnection = await getTenantConnection(sanitizedEmail);
 
-    if (!Model) {
-        // Automatically initialize a loose-schema model if it doesn't exist.
-        // This ensures the frontend doesn't 404 on new or empty collections.
-        const dynamicSchema = new mongoose.Schema({
-            tenantId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Tenant',
-                required: true,
-                index: true
-            }
-        }, {
-            timestamps: true,
-            strict: false // Allow any other fields to be saved
-        });
+        // 2. Collection name is simple because DB provides the isolation boundary
+        const modelName = collectionName;
 
-        // Add index on tenantId for isolation
-        dynamicSchema.index({ tenantId: 1 });
+        // 3. Check if model is already compiled on this connection
+        let Model = tenantConnection.models[modelName];
 
-        try {
-            Model = mongoose.model(modelName, dynamicSchema);
-            console.log(`Initialized dynamic model: ${modelName}`);
-        } catch (err) {
-            // Handle race condition if model was created between check and create
-            if (err.name === 'OverwriteModelError') {
-                Model = mongoose.models[modelName];
-            } else {
-                return res.status(500).json({ success: false, message: `Error creating resource ${collectionName}` });
+        if (!Model) {
+            // Automatically initialize a loose-schema model if it doesn't exist.
+            // This ensures the frontend doesn't 404 on new or empty collections.
+            const dynamicSchema = new mongoose.Schema({
+                tenantId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Tenant',
+                    required: true,
+                    index: true
+                }
+            }, {
+                timestamps: true,
+                strict: false // Allow any other fields to be saved
+            });
+
+            // Add index on tenantId for isolation safety net
+            dynamicSchema.index({ tenantId: 1 });
+
+            try {
+                Model = tenantConnection.model(modelName, dynamicSchema);
+                console.log(`Initialized dynamic model: ${modelName} on Tenant DB`);
+            } catch (err) {
+                // Handle race condition if model was created between check and create
+                if (err.name === 'OverwriteModelError') {
+                    Model = tenantConnection.models[modelName];
+                } else {
+                    return res.status(500).json({ success: false, message: `Error creating resource ${collectionName}` });
+                }
             }
         }
-    }
 
-    req.dynamicModel = Model;
-    next();
+        req.dynamicModel = Model;
+        next();
+    } catch (error) {
+        console.error("Model loader error:", error);
+        return res.status(500).json({ success: false, message: 'Failed to connect to tenant database' });
+    }
 };
 
 // @desc    Get all resources

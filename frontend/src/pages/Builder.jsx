@@ -367,14 +367,28 @@ const Builder = () => {
         const newInstance = {
             id: `${mod.slug}_${Date.now()}`,
             moduleSlug: mod.slug,
+            moduleType: mod.slug,
             pageName: activePage,
             collectionName: `${mod.slug.toLowerCase().replace(/\s+/g, '_')}_data`,
             config: mod.defaultConfig || {}
         };
 
         const updatedTool = { ...tool };
+
+        // Also add the instance ID to the active page's sections array so PublicApp knows to render it
+        const updatedPages = currentVer.pages.map(p => {
+            if ((typeof p === 'object' ? p.name : p) === activePage) {
+                return {
+                    ...(typeof p === 'object' ? p : { name: p, slug: String(p).toLowerCase().replace(/\s+/g, '-'), icon: 'LayoutDashboard', sections: [] }),
+                    sections: [...((typeof p === 'object' ? p.sections : []) || []), newInstance.id]
+                };
+            }
+            return p;
+        });
+
         updatedTool.versions[tool.currentVersion - 1] = {
             ...currentVer,
+            pages: updatedPages,
             instances: [...(currentVer.instances || []), newInstance]
         };
 

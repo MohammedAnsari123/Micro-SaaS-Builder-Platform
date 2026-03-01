@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Columns, MoreHorizontal, Plus, RefreshCw, User, Calendar, Tag, Search, GripVertical } from 'lucide-react';
+import { Columns, MoreHorizontal, Plus, RefreshCw, User, Calendar, Tag, Search, GripVertical, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 

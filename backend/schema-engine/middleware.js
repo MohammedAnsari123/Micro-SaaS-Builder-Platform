@@ -15,11 +15,11 @@ const bindDynamicModel = (collectionName) => {
             // New Naming Convention: sanitizedEmail_tenantID_collectionName
             const sanitizeEmail = (email) => {
                 if (!email) return 'default';
-                return email.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+                return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
             };
 
             const sanitizedEmail = sanitizeEmail(req.user?.email);
-            const modelName = `${sanitizedEmail}_${req.tenantId}_${collectionName}`;
+            const modelName = `${sanitizedEmail}_${collectionName}`;
             const mongoose = require('mongoose');
 
             let Model = mongoose.models[modelName];

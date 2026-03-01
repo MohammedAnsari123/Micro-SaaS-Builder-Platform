@@ -691,14 +691,14 @@ const Landing = () => {
             <FeaturesSection />
 
             {/* Stats Bar */}
-            <section className="py-14 sm:py-20 px-6 bg-[#0F3460]/30 border-y border-white/5">
+            {/* <section className="py-14 sm:py-20 px-6 bg-[#0F3460]/30 border-y border-white/5">
                 <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
                     <Counter value={10000} suffix="+" label="Apps Generated" />
                     <Counter value={99} suffix="%" label="Uptime SLA" />
                     <Counter value={50} suffix="ms" label="Avg Response" />
                     <Counter value={150} suffix="+" label="Countries" />
                 </div>
-            </section>
+            </section> */}
 
             {/* Section 3 — How It Works */}
             <HowItWorksSection />

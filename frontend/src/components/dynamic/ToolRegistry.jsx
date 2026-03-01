@@ -9,34 +9,33 @@ const CalendarView = lazy(() => import('../modules/CalendarView'));
 
 // Tool Registry Map
 const tools = {
+    // Builder Slugs
+    'crud_table': CrudTable,
+    'chart_dashboard': ChartDashboard,
+    'kanban_board': KanbanBoard,
+    'event_calendar': CalendarView,
+    'metric_cards': MetricCards,
+    'form_builder': CrudTable,
+    'user_manager': CrudTable,
+    'file_manager': CrudTable,
+
+    // Legacy Slugs
     'analytics-dashboard': ChartDashboard,
     'crm-manager': CrudTable,
     'kanban-board': KanbanBoard,
     'invoice-generator': CrudTable,
-    'lead-tracker': CrudTable,
-    'inventory-manager': CrudTable,
-    'sales-dashboard': ChartDashboard,
-    'employee-directory': CrudTable,
-    'task-list': KanbanBoard,
-    'ticket-system': CrudTable,
-    'seo-tracker': ChartDashboard,
-    'email-campaigner': CrudTable,
-    'expense-tracker': CrudTable,
-    'web-traffic-monitor': ChartDashboard,
-    'customer-directory': CrudTable,
-    'project-list': KanbanBoard,
-    'metric-cards': MetricCards,
     'event-calendar': CalendarView,
-    'gantt-chart': CalendarView,
-    // Add more tools here as modules are developed
+    'metric-cards': MetricCards
 };
 
 /**
  * ToolRegistry Component
  * Renders a tool based on its slug.
  */
-export const ToolRenderer = ({ slug, config }) => {
-    const Component = tools[slug];
+export const ToolRenderer = ({ slug, instanceData }) => {
+    // Normalize slug (replace hyphens with underscores for loose matching if needed)
+    const normalizedSlug = slug ? slug.replace(/-/g, '_') : '';
+    const Component = tools[slug] || tools[normalizedSlug] || CrudTable;
 
     if (!Component) {
         return (
@@ -49,7 +48,7 @@ export const ToolRenderer = ({ slug, config }) => {
 
     return (
         <Suspense fallback={<div className="animate-pulse bg-slate-100 h-64 rounded-xl"></div>}>
-            <Component instance={config} />
+            <Component instance={instanceData} />
         </Suspense>
     );
 };

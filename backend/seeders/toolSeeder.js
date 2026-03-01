@@ -58,7 +58,7 @@ const seedTools = async () => {
             isPublic: true,
             versions: [{
                 version: 1,
-                pages: ['Dashboard'],
+                pages: [{ name: 'Dashboard', slug: 'dashboard', sections: [] }],
                 layoutConfig: {},
                 instances: [],
                 schemas: []

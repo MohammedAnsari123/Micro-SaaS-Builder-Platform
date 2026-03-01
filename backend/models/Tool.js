@@ -93,6 +93,9 @@ const toolSchema = new mongoose.Schema({
         default: 1
     },
     versions: [ToolVersionSchema],
+    dbName: {
+        type: String
+    },
     createdAt: {
         type: Date,
         default: Date.now

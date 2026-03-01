@@ -14,9 +14,9 @@ const PageRenderer = ({ page, template }) => {
         );
     }
 
-    // Helper to find instance config by moduleSlug
-    const getInstanceConfig = (slug) => {
-        return (template?.instances || []).find(inst => inst.moduleSlug === slug);
+    // Helper to find instance config by id or moduleSlug (legacy support)
+    const getInstanceConfig = (sectionId) => {
+        return (template?.instances || []).find(inst => inst.id === sectionId || inst.moduleSlug === sectionId);
     };
 
     return (
@@ -31,8 +31,8 @@ const PageRenderer = ({ page, template }) => {
                     return (
                         <section key={`${sectionSlug}-${index}`} className="w-full">
                             <ToolRenderer
-                                slug={instance?.moduleType || sectionSlug}
-                                config={instance?.config || {}}
+                                slug={instance?.moduleSlug || instance?.moduleType || sectionSlug}
+                                instanceData={instance || {}}
                             />
                         </section>
                     );
