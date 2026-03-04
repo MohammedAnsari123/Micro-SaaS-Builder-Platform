@@ -5,8 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Tenants from './pages/Tenants';
-import Templates from './pages/Templates';
-import Marketplace from './pages/Marketplace';
+import Ecosystem from './pages/Ecosystem';
 import Billing from './pages/Billing';
 import Analytics from './pages/Analytics';
 import Security from './pages/Security';
@@ -22,8 +21,7 @@ function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="users" element={<Users />} />
         <Route path="tenants" element={<Tenants />} />
-        <Route path="templates" element={<Templates />} />
-        <Route path="marketplace" element={<Marketplace />} />
+        <Route path="ecosystem" element={<Ecosystem />} />
         <Route path="billing" element={<Billing />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="security" element={<Security />} />

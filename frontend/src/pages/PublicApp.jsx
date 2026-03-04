@@ -3,10 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import LayoutRenderer from '../components/dynamic/LayoutRenderer';
+import { ContentProvider } from '../context/ContentContext';
+import ThemeProvider from '../context/ThemeProvider';
+import TemplateRenderer from '../components/templates/TemplateRenderer';
 
 const PublicApp = () => {
-    const { templateName, emailPrefix } = useParams();
+    const { templateName, emailPrefix, cloneId } = useParams();
     const [siteData, setSiteData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,8 +17,8 @@ const PublicApp = () => {
         const fetchPublicApp = async () => {
             try {
                 setLoading(true);
-                // No token needed for public view
-                const url = `http://localhost:5000/api/v1/tools/resolve/${templateName}/${emailPrefix}`;
+                // Use the new template-based resolve endpoint
+                const url = `http://localhost:5000/api/v1/templates/resolve/${templateName}/${emailPrefix}${cloneId ? `/${cloneId}` : ''}`;
                 const res = await axios.get(url);
 
                 if (res.data.success) {
@@ -37,23 +39,41 @@ const PublicApp = () => {
 
     if (loading) {
         return (
-            <div className="h-screen w-full bg-slate-900 flex flex-col items-center justify-center">
-                <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                <h2 className="text-xl font-bold text-white tracking-tight">Initializing Application</h2>
-                <p className="text-slate-400 mt-2">Connecting to CodeAra Infrastructure...</p>
+            <div style={{
+                height: '100vh', width: '100%', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+            }}>
+                <Loader2 style={{ width: '48px', height: '48px', color: '#3b82f6', animation: 'spin 1s linear infinite', marginBottom: '16px' }} />
+                <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>Initializing Site</h2>
+                <p style={{ color: '#94a3b8', marginTop: '8px' }}>Loading your experience...</p>
+                <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
             </div>
         );
     }
 
     if (error || !siteData) {
         return (
-            <div className="h-screen w-full bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
-                    <AlertCircle className="w-8 h-8 text-red-500" />
+            <div style={{
+                height: '100vh', width: '100%', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center',
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+            }}>
+                <div style={{
+                    width: '64px', height: '64px', borderRadius: '999px',
+                    backgroundColor: 'rgba(239,68,68,0.1)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', marginBottom: '24px'
+                }}>
+                    <AlertCircle style={{ width: '32px', height: '32px', color: '#ef4444' }} />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Application Offline</h2>
-                <p className="text-slate-400 max-w-md mb-8">{error || "The requested application was not found or is currently private."}</p>
-                <Link to="/" className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all font-bold">
+                <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>Site Not Found</h2>
+                <p style={{ color: '#94a3b8', maxWidth: '400px', marginBottom: '32px' }}>
+                    {error || "The requested site was not found or is currently offline."}
+                </p>
+                <Link to="/" style={{
+                    padding: '12px 24px', backgroundColor: '#3b82f6', color: '#fff',
+                    borderRadius: '12px', textDecoration: 'none', fontWeight: 600, fontSize: '14px'
+                }}>
                     Go to CodeAra Home
                 </Link>
             </div>
@@ -61,19 +81,34 @@ const PublicApp = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            <LayoutRenderer template={siteData.template} theme={siteData.theme} />
+        <ContentProvider
+            tenantId={siteData.tenantId}
+            cloneId={siteData.cloneId}
+            template={siteData.template}
+            theme={siteData.theme}
+            siteSettings={siteData.siteSettings}
+            plan={siteData.plan}
+        >
+            <ThemeProvider>
+                <TemplateRenderer />
 
-            {/* CodeAra Branding Overlay for Free Plans */}
-            {siteData.plan === 'free' && (
-                <div className="fixed bottom-4 right-4 z-[9999]">
-                    <Link to="/" className="flex items-center gap-2 bg-white/80 backdrop-blur-md border border-slate-200 px-3 py-1.5 rounded-full shadow-lg hover:shadow-xl transition-all group">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Powered by</span>
-                        <span className="text-xs font-black text-blue-600">CodeAra</span>
-                    </Link>
-                </div>
-            )}
-        </div>
+                {/* CodeAra Branding for Free Plans */}
+                {siteData.plan === 'free' && (
+                    <div style={{ position: 'fixed', bottom: '16px', right: '16px', zIndex: 9999 }}>
+                        <Link to="/" style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(12px)',
+                            border: '1px solid #e2e8f0', padding: '6px 14px',
+                            borderRadius: '999px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                            textDecoration: 'none', transition: 'all 0.2s'
+                        }}>
+                            <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Powered by</span>
+                            <span style={{ fontSize: '12px', fontWeight: 800, color: '#3b82f6' }}>CodeAra</span>
+                        </Link>
+                    </div>
+                )}
+            </ThemeProvider>
+        </ContentProvider>
     );
 };
 

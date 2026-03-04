@@ -50,7 +50,6 @@ const Settings = () => {
         proPrice: 29,
         rateLimitPerMinute: 100,
         enableRegistration: true,
-        enableMarketplace: true,
     });
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -176,12 +175,7 @@ const Settings = () => {
                             enabled={settings.enableRegistration}
                             onChange={() => setSettings(s => ({ ...s, enableRegistration: !s.enableRegistration }))}
                         />
-                        <SettingsRow
-                            label="Public Marketplace"
-                            description="Enable public browsing of the template marketplace for unauthenticated users."
-                            enabled={settings.enableMarketplace}
-                            onChange={() => setSettings(s => ({ ...s, enableMarketplace: !s.enableMarketplace }))}
-                        />
+
                     </div>
                 </motion.div>
 
@@ -240,26 +234,6 @@ const Settings = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-                        <div className="group">
-                            <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-2">
-                                <Gauge className="w-4 h-4 text-brand-400" /> Marketplace Commission
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    value={settings.commissionPercentage}
-                                    onChange={e => setSettings(s => ({ ...s, commissionPercentage: parseInt(e.target.value) || 0 }))}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-bold tracking-wide focus:outline-none focus:border-brand-500 focus:bg-slate-900 transition-all"
-                                />
-                                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                    <span className="text-slate-500 font-bold">%</span>
-                                </div>
-                            </div>
-                            <p className="text-xs text-slate-500 mt-2 font-medium">Cut taken from marketplace sales</p>
-                        </div>
-
                         <div className="group">
                             <label className="flex items-center gap-2 text-sm font-bold text-slate-300 mb-2">
                                 <Activity className="w-4 h-4 text-cyan-400" /> API Rate Limit

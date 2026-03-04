@@ -31,7 +31,6 @@ const adminSchema = new mongoose.Schema({
         users: { type: Boolean, default: true },
         tenants: { type: Boolean, default: true },
         templates: { type: Boolean, default: true },
-        marketplace: { type: Boolean, default: true },
         billing: { type: Boolean, default: true },
         aiMonitor: { type: Boolean, default: true },
         analytics: { type: Boolean, default: true },

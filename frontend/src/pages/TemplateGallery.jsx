@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Copy, LayoutTemplate } from 'lucide-react';
+import { Copy, LayoutTemplate, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -34,7 +34,7 @@ const TemplateGallery = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (res.data.success) {
-                navigate(`/builder/${res.data.data._id}`);
+                navigate('/admin/manage');
             }
         } catch (err) {
             console.error("Clone Error:", err);
@@ -113,10 +113,16 @@ const TemplateGallery = () => {
 
                                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
                                         <button
-                                            onClick={() => handleClone(template._id)}
-                                            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl transition-colors font-medium shadow-lg shadow-blue-500/25"
+                                            onClick={() => navigate(`/templatePreview/${template.slug}`)}
+                                            className="w-1/2 flex items-center justify-center gap-2 bg-slate-700/50 hover:bg-slate-600 text-slate-200 py-3 rounded-xl transition-colors font-medium border border-slate-600"
                                         >
-                                            <Copy className="w-4 h-4" /> Use Blueprint
+                                            <Monitor className="w-4 h-4" /> Preview
+                                        </button>
+                                        <button
+                                            onClick={() => handleClone(template._id)}
+                                            className="w-1/2 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl transition-colors font-medium shadow-lg shadow-blue-500/25"
+                                        >
+                                            <Copy className="w-4 h-4" /> Use
                                         </button>
                                     </div>
                                 </motion.div>

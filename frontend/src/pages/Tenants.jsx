@@ -27,7 +27,7 @@ const getTheme = (color) => themeColors[color] || themeColors['blue'];
 
 const Tenants = () => {
     const [websites, setWebsites] = useState([]);
-    const [tools, setTools] = useState([]);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
 
@@ -37,14 +37,14 @@ const Tenants = () => {
                 const token = localStorage.getItem('token');
                 const headers = { Authorization: `Bearer ${token}` };
 
-                // Fetch both cloned websites AND user's tools
-                const [cloneRes, toolsRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/v1/user/cloned-websites', { headers }).catch(() => ({ data: { data: [] } })),
-                    axios.get('http://localhost:5000/api/v1/tools', { headers }).catch(() => ({ data: { data: [] } }))
-                ]);
-
+                // Fetch cloned websites
+                const cloneRes = await axios.get('http://localhost:5000/api/v1/user/cloned-websites', { headers });
                 if (cloneRes.data.success) setWebsites(cloneRes.data.data);
-                if (toolsRes.data.success) setTools(toolsRes.data.data);
+
+                // Fetch user profile for vanity URL
+                const userRes = await axios.get('http://localhost:5000/api/v1/auth/me', { headers });
+                if (userRes.data.success) setUser(userRes.data.data);
+
             } catch (err) {
                 console.error("Failed to fetch ecosystem data", err);
             } finally {
@@ -54,35 +54,20 @@ const Tenants = () => {
         fetchData();
     }, []);
 
-    // Combine cloned websites + standalone tools into one list
-    const allApps = [
-        ...websites.map(w => ({ ...w, source: 'clone' })),
-        ...tools.filter(t => !websites.some(w => w.toolId === t._id)).map(t => ({
-            _id: t._id,
-            toolId: t._id,
-            name: t.name,
-            slug: t.slug,
-            templateName: null,
-            colorTheme: 'blue',
-            category: t.category || 'Custom',
-            tags: t.tags || [],
-            description: t.description || '',
-            collections: t.versions?.[t.currentVersion - 1]?.schemas?.length || 0,
-            pages: t.versions?.[t.currentVersion - 1]?.pages || [],
-            isPublic: t.isPublic,
-            cloneSource: 'custom',
-            clonedAt: t.createdAt,
-            source: 'tool'
-        }))
-    ];
-
     const filtered = filter
-        ? allApps.filter(a => a.name.toLowerCase().includes(filter.toLowerCase()) || a.category?.toLowerCase().includes(filter.toLowerCase()))
-        : allApps;
+        ? websites.filter(a => a.name.toLowerCase().includes(filter.toLowerCase()) || a.category?.toLowerCase().includes(filter.toLowerCase()))
+        : websites;
 
     const formatDate = (d) => {
         if (!d) return '—';
         return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    const getPublicUrl = (app) => {
+        const slug = app.templateId?.slug || app.slug;
+        if (!user || !slug) return '#';
+        const emailPrefix = user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+        return `/site/${slug}/${emailPrefix}/${app._id}`;
     };
 
     return (
@@ -97,7 +82,7 @@ const Tenants = () => {
                     <Link to="/templates" className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-3 rounded-xl font-bold transition-all text-sm border border-white/5">
                         <Layers className="w-4 h-4" /> Browse Templates
                     </Link>
-                    <Link to="/builder/new" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
+                    <Link to="/templates" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
                         <Plus className="w-4 h-4" /> New App
                     </Link>
                 </div>
@@ -107,19 +92,21 @@ const Tenants = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Apps</div>
-                    <div className="text-2xl font-bold text-white">{allApps.length}</div>
+                    <div className="text-2xl font-bold text-white">{websites.length}</div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Cloned</div>
                     <div className="text-2xl font-bold text-blue-400">{websites.length}</div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                    <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Custom Built</div>
-                    <div className="text-2xl font-bold text-emerald-400">{allApps.filter(a => a.source === 'tool').length}</div>
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Modules Used</div>
+                    <div className="text-2xl font-bold text-emerald-400">
+                        {websites.reduce((acc, curr) => acc + (curr.collections || 0), 0)}
+                    </div>
                 </div>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Published</div>
-                    <div className="text-2xl font-bold text-violet-400">{allApps.filter(a => a.isPublic).length}</div>
+                    <div className="text-2xl font-bold text-violet-400">{websites.filter(a => a.isPublic).length}</div>
                 </div>
             </div>
 
@@ -127,9 +114,7 @@ const Tenants = () => {
             <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
                 <div className="p-6 border-b border-white/5 flex items-center justify-between">
                     <div className="flex bg-slate-800 rounded-xl p-1 border border-white/5">
-                        <button className="px-4 py-1.5 text-xs font-bold bg-slate-700 text-white rounded-lg">All ({allApps.length})</button>
-                        <button className="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-300">Cloned ({websites.length})</button>
-                        <button className="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-300">Custom</button>
+                        <button className="px-4 py-1.5 text-xs font-bold bg-slate-700 text-white rounded-lg">All ({websites.length})</button>
                     </div>
                     <div className="relative">
                         <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -183,24 +168,19 @@ const Tenants = () => {
                                                             {app.templateName}
                                                         </span>
                                                     )}
-                                                    {app.source === 'tool' && (
-                                                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                                                            Custom Build
-                                                        </span>
-                                                    )}
                                                     <span className="text-[10px] font-bold text-slate-500">{app.category}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
-                                            Active
+                                        <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border ${app.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                                            {app.status || 'Active'}
                                         </span>
                                     </div>
 
                                     {/* Meta Info */}
                                     <div className="flex items-center gap-4 mb-4 text-[11px] text-slate-500 font-medium">
                                         <span className="flex items-center gap-1">
-                                            <Database className="w-3 h-3" /> {app.collections} Collections
+                                            <Database className="w-3 h-3" /> {app.collections} Modules
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <Layers className="w-3 h-3" /> {app.pages?.length || 0} Pages
@@ -212,15 +192,15 @@ const Tenants = () => {
 
                                     {/* Pages Preview */}
                                     {app.pages && app.pages.length > 0 && (
-                                        <div className="flex flex-wrap gap-1.5 mb-4">
-                                            {app.pages.slice(0, 4).map((page, j) => (
-                                                <span key={j} className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md border border-white/5">
-                                                    {page.name || page}
+                                        <div className="flex flex-wrap gap-1.5 mb-4 border-l-2 border-slate-700 pl-3">
+                                            {app.pages.slice(0, 5).map((page, j) => (
+                                                <span key={j} className="text-[10px] font-bold text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded-md border border-white/5">
+                                                    {page}
                                                 </span>
                                             ))}
-                                            {app.pages.length > 4 && (
-                                                <span className="text-[10px] font-bold text-slate-500 bg-slate-800 px-2 py-0.5 rounded-md border border-white/5">
-                                                    +{app.pages.length - 4} more
+                                            {app.pages.length > 5 && (
+                                                <span className="text-[10px] font-bold text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded-md border border-white/5">
+                                                    +{app.pages.length - 5} more
                                                 </span>
                                             )}
                                         </div>
@@ -229,16 +209,19 @@ const Tenants = () => {
                                     {/* Actions */}
                                     <div className="flex items-center gap-2 pt-3 border-t border-white/5">
                                         <Link
-                                            to={`/builder/${app.toolId}`}
-                                            className="flex-1 text-center py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl font-bold transition-all text-xs border border-blue-500/20"
+                                            to={`/admin/manage/${app._id}`}
+                                            className="flex-1 text-center py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl font-bold transition-all text-xs border border-blue-500/20 flex items-center justify-center gap-2 group/edit"
                                         >
-                                            Open Builder
+                                            <Palette className="w-3.5 h-3.5 group-hover/edit:rotate-12 transition-transform" /> Manage Site
                                         </Link>
-                                        {app.isPublic && (
-                                            <span className="py-2 px-3 bg-slate-800 text-slate-400 rounded-xl font-bold text-xs border border-white/5 flex items-center gap-1">
-                                                <Globe className="w-3 h-3" /> Live
-                                            </span>
-                                        )}
+                                        <a
+                                            href={getPublicUrl(app)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 text-center py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl font-bold transition-all text-xs border border-emerald-500/20 flex items-center justify-center gap-2 group/view"
+                                        >
+                                            <Globe className="w-3.5 h-3.5 group-hover/view:scale-110 transition-transform" /> Preview Site
+                                        </a>
                                     </div>
                                 </motion.div>
                             ))}

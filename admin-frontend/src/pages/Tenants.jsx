@@ -183,7 +183,7 @@ const Tenants = () => {
                                                 <td className="p-5">
                                                     <div className="flex items-center gap-2">
                                                         <Database className="w-4 h-4 text-slate-400" />
-                                                        <span className="text-slate-300 font-semibold">{t.toolCount || 0} Tools Deployed</span>
+                                                        <span className="text-slate-300 font-semibold">{t.toolCount || 0} Sites Deployed</span>
                                                     </div>
                                                     {/* Fake progress bar depicting tool usage */}
                                                     <div className="w-32 h-1.5 bg-black/30 rounded-full mt-2 overflow-hidden border border-white/5">

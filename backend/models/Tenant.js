@@ -18,6 +18,29 @@ const tenantSchema = new mongoose.Schema({
         ref: 'Template',
         required: false
     },
+    // Tenant can override template theme
+    theme: {
+        primary: { type: String, default: '#3b82f6' },
+        secondary: { type: String, default: '#64748b' },
+        accent: { type: String, default: '#10b981' },
+        background: { type: String, default: '#ffffff' },
+        text: { type: String, default: '#0f172a' },
+        font: { type: String, default: 'Inter, sans-serif' }
+    },
+    // Site-level settings
+    siteSettings: {
+        siteName: { type: String, default: '' },
+        tagline: { type: String, default: '' },
+        logo: { type: String, default: '' },
+        favicon: { type: String, default: '' },
+        socialLinks: {
+            facebook: { type: String, default: '' },
+            twitter: { type: String, default: '' },
+            instagram: { type: String, default: '' },
+            linkedin: { type: String, default: '' },
+            github: { type: String, default: '' }
+        }
+    },
     enabledTools: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Tool'
@@ -26,10 +49,6 @@ const tenantSchema = new mongoose.Schema({
         type: String,
         enum: ['free', 'pro', 'enterprise'],
         default: 'free'
-    },
-    themeId: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Theme'
     },
     isActive: {
         type: Boolean,

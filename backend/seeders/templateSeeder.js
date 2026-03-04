@@ -2,24 +2,188 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 const Template = require('../models/Template');
-const Tenant = require('../models/Tenant');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const Theme = require('../models/Theme');
-const Tool = require('../models/Tool');
-
 const templates = [
-    { name: 'Enterprise CRM', slug: 'enterprise-crm', category: 'Sales', description: 'End-to-end sales management.', layoutType: 'sidebar', pages: [{ name: 'Leads', slug: 'leads', icon: 'Target', sections: ['lead-tracker'] }, { name: 'Contacts', slug: 'contacts', icon: 'Users', sections: ['customer-directory'] }], version: 1, isPublic: true, colorTheme: 'blue' },
-    { name: 'Agency Suite', slug: 'agency-suite', category: 'Service', description: 'For modern creative agencies.', layoutType: 'navbar', pages: [{ name: 'Projects', slug: 'projects', icon: 'Briefcase', sections: ['kanban-board'] }, { name: 'Billing', slug: 'billing', icon: 'CreditCard', sections: ['invoice-generator'] }], version: 1, isPublic: true, colorTheme: 'indigo' },
-    { name: 'Inventory OS', slug: 'inventory-os', category: 'Operations', description: 'Stock tracking and logistics.', layoutType: 'sidebar', pages: [{ name: 'Warehouse', slug: 'warehouse', icon: 'Library', sections: ['inventory-manager'] }, { name: 'Staff', slug: 'staff', icon: 'UserCheck', sections: ['employee-directory'] }], version: 1, isPublic: true, colorTheme: 'emerald' },
-    { name: 'Startup Metrics', slug: 'startup-metrics', category: 'Analytics', description: 'Growth tracking for startups.', layoutType: 'sidebar', pages: [{ name: 'Growth', slug: 'growth', icon: 'TrendingUp', sections: ['sales-dashboard'] }, { name: 'Traffic', slug: 'traffic', icon: 'Globe', sections: ['web-traffic-monitor'] }], version: 1, isPublic: true, colorTheme: 'rose' },
-    { name: 'HR Portal', slug: 'hr-portal', category: 'Operations', description: 'Employee management system.', layoutType: 'navbar', pages: [{ name: 'Employees', slug: 'employees', icon: 'Users', sections: ['employee-directory'] }, { name: 'Attendance', slug: 'attendance', icon: 'Calendar', sections: ['event-calendar'] }], version: 1, isPublic: true, colorTheme: 'violet' },
-    { name: 'E-commerce ERP', slug: 'ecommerce-erp', category: 'Business', description: 'Manage shop orders and stock.', layoutType: 'sidebar', pages: [{ name: 'Orders', slug: 'orders', icon: 'ShoppingCart', sections: ['invoice-generator'] }, { name: 'Products', slug: 'products', icon: 'Box', sections: ['inventory-manager'] }], version: 1, isPublic: true, colorTheme: 'teal' },
-    { name: 'Freelancer Kit', slug: 'freelancer-kit', category: 'Service', description: 'Project tracking for individuals.', layoutType: 'navbar', pages: [{ name: 'Tasks', slug: 'tasks', icon: 'CheckSquare', sections: ['task-list'] }, { name: 'Timeline', slug: 'timeline', icon: 'Clock', sections: ['gantt-chart'] }], version: 1, isPublic: true, colorTheme: 'orange' },
-    { name: 'Support Center', slug: 'support-center', category: 'Support', description: 'Help desk and ticketing system.', layoutType: 'sidebar', pages: [{ name: 'Tickets', slug: 'tickets', icon: 'MessageSquare', sections: ['ticket-system'] }, { name: 'Users', slug: 'users', icon: 'Shield', sections: ['customer-directory'] }], version: 1, isPublic: true, colorTheme: 'cyan' },
-    { name: 'Marketing Hub', slug: 'marketing-hub', category: 'Marketing', description: 'Ads and campaign management.', layoutType: 'navbar', pages: [{ name: 'SEO', slug: 'seo', icon: 'Search', sections: ['seo-tracker'] }, { name: 'Campaigns', slug: 'campaigns', icon: 'Mail', sections: ['email-campaigner'] }], version: 1, isPublic: true, colorTheme: 'fuchsia' },
-    { name: 'Finance OS', slug: 'finance-os', category: 'Business', description: 'Corporate finance dashboard.', layoutType: 'sidebar', pages: [{ name: 'Revenue', slug: 'revenue', icon: 'DollarSign', sections: ['sales-dashboard'] }, { name: 'Expenses', slug: 'expenses', icon: 'CreditCard', sections: ['expense-tracker'] }], version: 1, isPublic: true, colorTheme: 'amber' }
+    // ============================================
+    // INFORMATIONAL TEMPLATES (5)
+    // ============================================
+    {
+        name: 'Portfolio',
+        slug: 'portfolio',
+        category: 'Personal',
+        type: 'informational',
+        description: 'Showcase your work, skills, and experience with a beautiful portfolio website.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'skills', 'featured_projects'] },
+            { name: 'About', slug: 'about', icon: 'User', sections: ['hero', 'experience'] },
+            { name: 'Projects', slug: 'projects', icon: 'Briefcase', sections: ['hero', 'list'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact'],
+        theme: { primary: '#6366f1', secondary: '#64748b', accent: '#f59e0b', background: '#ffffff', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Personal Resume',
+        slug: 'resume',
+        category: 'Personal',
+        type: 'informational',
+        description: 'Professional resume website to showcase your career, skills, and achievements.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'summary'] },
+            { name: 'Experience', slug: 'experience', icon: 'Briefcase', sections: ['hero', 'list'] },
+            { name: 'Skills', slug: 'skills', icon: 'Award', sections: ['hero', 'list'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact'],
+        theme: { primary: '#0f172a', secondary: '#475569', accent: '#3b82f6', background: '#f8fafc', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Agency',
+        slug: 'agency',
+        category: 'Business',
+        type: 'informational',
+        description: 'Modern agency website with services, portfolio, and team sections.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'stats', 'services_preview'] },
+            { name: 'About', slug: 'about', icon: 'Users', sections: ['hero', 'team'] },
+            { name: 'Services', slug: 'services', icon: 'Layers', sections: ['hero', 'list'] },
+            { name: 'Projects', slug: 'projects', icon: 'Briefcase', sections: ['hero', 'list'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact'],
+        theme: { primary: '#7c3aed', secondary: '#64748b', accent: '#ec4899', background: '#ffffff', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Startup Landing Page',
+        slug: 'startup-landing',
+        category: 'Business',
+        type: 'informational',
+        description: 'High-converting landing page for startups with features, pricing, and FAQ.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Rocket', sections: ['hero', 'logos'] },
+            { name: 'Features', slug: 'features', icon: 'Zap', sections: ['hero', 'list'] },
+            { name: 'Pricing', slug: 'pricing', icon: 'CreditCard', sections: ['hero', 'plans'] },
+            { name: 'FAQ', slug: 'faq', icon: 'HelpCircle', sections: ['hero', 'list'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact'],
+        theme: { primary: '#2563eb', secondary: '#64748b', accent: '#10b981', background: '#ffffff', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Product Showcase',
+        slug: 'product-showcase',
+        category: 'Business',
+        type: 'informational',
+        description: 'Showcase your product with a sleek landing page, features, and gallery.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'highlights'] },
+            { name: 'Features', slug: 'features', icon: 'Star', sections: ['hero', 'list'] },
+            { name: 'Gallery', slug: 'gallery', icon: 'Image', sections: ['hero', 'images'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact'],
+        theme: { primary: '#0ea5e9', secondary: '#475569', accent: '#f97316', background: '#ffffff', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+
+    // ============================================
+    // FUNCTIONAL TEMPLATES (5)
+    // ============================================
+    {
+        name: 'Restaurant Ordering',
+        slug: 'restaurant',
+        category: 'Food & Beverage',
+        type: 'functional',
+        description: 'Restaurant website with menu display, online ordering, and contact.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'highlights', 'hours'] },
+            { name: 'Menu', slug: 'menu', icon: 'UtensilsCrossed', sections: ['hero'] },
+            { name: 'Cart', slug: 'cart', icon: 'ShoppingCart', sections: [] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact', 'product', 'order'],
+        theme: { primary: '#dc2626', secondary: '#78350f', accent: '#f59e0b', background: '#fffbeb', text: '#1c1917', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Car Booking',
+        slug: 'car-booking',
+        category: 'Automotive',
+        type: 'functional',
+        description: 'Vehicle rental website with fleet display and online booking.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'highlights'] },
+            { name: 'Cars', slug: 'cars', icon: 'Car', sections: ['hero'] },
+            { name: 'Book', slug: 'booking', icon: 'Calendar', sections: ['hero'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact', 'product', 'booking'],
+        theme: { primary: '#1e40af', secondary: '#334155', accent: '#0ea5e9', background: '#f0f9ff', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Service Booking',
+        slug: 'service-booking',
+        category: 'Services',
+        type: 'functional',
+        description: 'Service booking website for salons, repair shops, and appointment-based businesses.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'highlights'] },
+            { name: 'Services', slug: 'services', icon: 'Scissors', sections: ['hero'] },
+            { name: 'Book', slug: 'book', icon: 'Calendar', sections: ['hero'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact', 'service', 'booking'],
+        theme: { primary: '#be185d', secondary: '#64748b', accent: '#f472b6', background: '#fdf2f8', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Event Management',
+        slug: 'event-management',
+        category: 'Events',
+        type: 'functional',
+        description: 'Event management website with event listings, registration, and contact.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'highlights'] },
+            { name: 'Events', slug: 'events', icon: 'Calendar', sections: ['hero'] },
+            { name: 'Register', slug: 'register', icon: 'UserPlus', sections: ['hero'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact', 'event', 'registration'],
+        theme: { primary: '#7c3aed', secondary: '#64748b', accent: '#a78bfa', background: '#faf5ff', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Small Marketplace',
+        slug: 'marketplace',
+        category: 'E-Commerce',
+        type: 'functional',
+        description: 'Simple marketplace catalog with product listings and ordering.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'categories'] },
+            { name: 'Products', slug: 'products', icon: 'ShoppingBag', sections: ['hero'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact', 'product', 'order'],
+        theme: { primary: '#059669', secondary: '#64748b', accent: '#14b8a6', background: '#f0fdf4', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    }
 ];
 
 const seedTemplates = async () => {
@@ -27,24 +191,23 @@ const seedTemplates = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB Connected for Template Seeding...');
 
-        const themes = await Theme.find();
-        const tools = await Tool.find();
+        // Load seed data for defaultContent
+        const seedData = require('./seedData');
 
         await Template.deleteMany({});
         console.log('Cleared all templates.');
 
-        const templatesWithRefs = templates.map((t, index) => {
-            const theme = themes[index % themes.length];
-            const tTools = tools.slice(0, 3).map(tool => tool._id);
+        // Attach defaultContent from seedData to each template
+        const templatesWithContent = templates.map(t => {
+            const data = seedData[t.slug];
             return {
                 ...t,
-                themeId: theme ? theme._id : null,
-                defaultTools: tTools
+                defaultContent: data ? data.content : []
             };
         });
 
-        await Template.insertMany(templatesWithRefs);
-        console.log(`${templates.length} Templates successfully imported.`);
+        await Template.insertMany(templatesWithContent);
+        console.log(`✅ ${templates.length} Templates successfully seeded.`);
 
         process.exit();
     } catch (err) {

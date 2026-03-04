@@ -10,9 +10,11 @@ const {
     updateTemplate,
     deleteTemplate,
     getTemplates,
-    getMarketplaceItems,
-    approveMarketplaceItem,
-    rejectMarketplaceItem,
+
+    getAllClones,
+    updateCloneStatus,
+    deleteClone,
+
     getBilling,
     getAnalytics,
     getSecurity,
@@ -34,9 +36,11 @@ router.get('/templates', getTemplates);
 router.post('/templates', createTemplate);
 router.put('/templates/:id', updateTemplate);
 router.delete('/templates/:id', deleteTemplate);
-router.get('/marketplace', getMarketplaceItems);
-router.put('/marketplace/:id/approve', approveMarketplaceItem);
-router.put('/marketplace/:id/reject', rejectMarketplaceItem);
+
+router.get('/clones', getAllClones);
+router.put('/clones/:id/status', updateCloneStatus);
+router.delete('/clones/:id', deleteClone);
+
 router.get('/billing', getBilling);
 
 router.get('/analytics', getAnalytics);

@@ -9,13 +9,12 @@ import Tenants from './pages/Tenants';
 import Analytics from './pages/Analytics';
 import Subscriptions from './pages/Subscriptions';
 import GlobalSettings from './pages/GlobalSettings';
-import Builder from './pages/Builder';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Marketplace from './pages/Marketplace';
-import ToolDetail from './pages/ToolDetail';
 import TemplateGallery from './pages/TemplateGallery';
+import TemplatePreview from './pages/TemplatePreview';
 import PublicApp from './pages/PublicApp';
+import TenantAdminLayout from './pages/admin/TenantAdminLayout';
 
 // Components
 import Navbar from './components/layout/Navbar';
@@ -38,12 +37,12 @@ const AppContent = () => {
   // Disable Lenis on dashboard routes AND the landing page (/ uses GSAP ScrollTrigger pinning)
   const isLandingPage = location.pathname === '/';
   const isDashboard = location.pathname.startsWith('/dashboard') ||
-    location.pathname.startsWith('/tenants') ||
+    location.pathname.startsWith('/sites') ||
     location.pathname.startsWith('/analytics') ||
     location.pathname.startsWith('/subscriptions') ||
     location.pathname.startsWith('/settings') ||
-    location.pathname.startsWith('/marketplace') ||
-    location.pathname.startsWith('/builder') ||
+    location.pathname.startsWith('/templatePreview') ||
+    location.pathname.startsWith('/admin') ||
     location.pathname.startsWith('/site');
   const disableLenis = isDashboard || isLandingPage;
 
@@ -104,32 +103,25 @@ const AppContent = () => {
             }
           >
             <Route path="/dashboard" element={<DashboardOverview />} />
-            <Route path="/tenants" element={<Tenants />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/marketplace/:id" element={<ToolDetail />} />
+            <Route path="/sites" element={<Tenants />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/settings" element={<GlobalSettings />} />
           </Route>
 
+          <Route path="/templates" element={<TemplateGallery />} />
+          <Route path="/templatePreview/:slug" element={<TemplatePreview />} />
+          <Route path="/site/:templateName/:emailPrefix/:cloneId?" element={<PublicApp />} />
+
+          {/* CMS Site Management (Tenant Admin) */}
           <Route
-            path="/builder/:id"
+            path="/admin/manage/:cloneId?"
             element={
               <ProtectedRoute>
-                <Builder />
+                <TenantAdminLayout token={localStorage.getItem('token')} onLogout={() => { localStorage.removeItem('token'); window.location.href = '/login'; }} />
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/builder/:templateName/:emailPrefix/minisaas.in"
-            element={
-              <ProtectedRoute>
-                <Builder />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/templateSites" element={<TemplateGallery />} />
-          <Route path="/site/:templateName/:emailPrefix" element={<PublicApp />} />
         </Routes>
       </main>
     </div>

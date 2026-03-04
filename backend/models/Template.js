@@ -1,23 +1,6 @@
 const mongoose = require('mongoose');
 
-// We reuse the generic architecture definitions
-const SchemaFieldSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    type: { type: String, required: true },
-    required: { type: Boolean, default: false },
-    unique: { type: Boolean, default: false }
-});
-
-const SchemaMetaSchema = new mongoose.Schema({
-    tableName: { type: String, required: true },
-    fields: [SchemaFieldSchema],
-    indexes: [{ type: String }]
-});
-
 const templateSchema = new mongoose.Schema({
-    schemaConfig: {
-        tables: [SchemaMetaSchema]
-    },
     name: {
         type: String,
         required: [true, 'Please provide a template name'],
@@ -36,36 +19,51 @@ const templateSchema = new mongoose.Schema({
         trim: true,
         default: 'General'
     },
+    type: {
+        type: String,
+        enum: ['informational', 'functional'],
+        default: 'informational'
+    },
     description: {
         type: String,
         maxlength: [500, 'Description cannot be more than 500 characters']
     },
-    layoutType: {
-        type: String,
-        enum: ['sidebar', 'navbar', 'hybrid'],
-        default: 'sidebar'
-    },
-    themeId: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Theme'
-    },
+    // Pages this template includes
     pages: [{
         name: { type: String, required: true },
         slug: { type: String, required: true },
-        icon: { type: String }, // Lucide icon name
-        sections: [{ type: String }] // Array of tool slugs or section names
+        icon: { type: String },
+        sections: [{ type: String }]
     }],
-    defaultTools: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'Tool'
+    // Which backend modules this template uses (e.g. ['product', 'order', 'contact'])
+    modules: [{
+        type: String,
+        trim: true
     }],
+    // Inline theme — no separate Theme model dependency
+    theme: {
+        primary: { type: String, default: '#3b82f6' },
+        secondary: { type: String, default: '#64748b' },
+        accent: { type: String, default: '#10b981' },
+        background: { type: String, default: '#ffffff' },
+        text: { type: String, default: '#0f172a' },
+        font: { type: String, default: 'Inter, sans-serif' }
+    },
+    // Default content to seed when cloning (array of { page, section, data })
+    defaultContent: [{
+        page: { type: String, required: true },
+        section: { type: String, required: true },
+        data: { type: mongoose.Schema.Types.Mixed, default: {} },
+        order: { type: Number, default: 0 }
+    }],
+    // Preview image URL for gallery
+    previewImage: {
+        type: String,
+        default: ''
+    },
     version: {
         type: Number,
         default: 1
-    },
-    colorTheme: {
-        type: String,
-        default: 'blue'
     },
     isPublic: {
         type: Boolean,
@@ -79,8 +77,9 @@ const templateSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Performance index for rapid slug lookup on public Gallery queries
+// Performance indexes
 templateSchema.index({ slug: 1 });
 templateSchema.index({ isPublic: 1 });
+templateSchema.index({ type: 1, isPublic: 1 });
 
 module.exports = mongoose.model('Template', templateSchema);

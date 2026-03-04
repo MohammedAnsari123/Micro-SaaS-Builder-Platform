@@ -50,6 +50,31 @@ const templateCloneSchema = new mongoose.Schema({
         type: String
     },
 
+    // Theme override for this specific clone
+    theme: {
+        primary: { type: String },
+        secondary: { type: String },
+        accent: { type: String },
+        background: { type: String },
+        text: { type: String },
+        font: { type: String }
+    },
+
+    // Site-level settings for this specific clone
+    siteSettings: {
+        siteName: { type: String, default: '' },
+        tagline: { type: String, default: '' },
+        logo: { type: String, default: '' },
+        favicon: { type: String, default: '' },
+        socialLinks: {
+            facebook: { type: String, default: '' },
+            twitter: { type: String, default: '' },
+            instagram: { type: String, default: '' },
+            linkedin: { type: String, default: '' },
+            github: { type: String, default: '' }
+        }
+    },
+
     clonedAt: {
         type: Date,
         default: Date.now

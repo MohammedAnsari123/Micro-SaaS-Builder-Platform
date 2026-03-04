@@ -71,7 +71,7 @@ const Dashboard = () => {
             + `Total Users,${metrics.totalUsers}\n`
             + `Total Tenants,${metrics.totalTenants}\n`
             + `Monthly Revenue,${metrics.monthlyRevenue}\n`
-            + `Deployed Tools,${metrics.deployedTools}\n`
+            + `Deployed Sites,${metrics.deployedTools}\n`
             + `API Traffic Vol,${metrics.apiUsage}\n`
             + `Active Subs,${metrics.activeSubscriptions}\n`
             + `Error Logs,${metrics.errorCount}\n`;
@@ -148,7 +148,7 @@ const Dashboard = () => {
                 <MetricCard title="Total Users" value={m.totalUsers?.toLocaleString() || '0'} trend="12.5%" isPositive={true} icon={Users} colorClass="from-blue-500 to-cyan-500" delay={0.1} />
                 <MetricCard title="Active Tenants" value={m.totalTenants?.toLocaleString() || '0'} trend="8.2%" isPositive={true} icon={Database} colorClass="from-emerald-500 to-teal-500" delay={0.2} />
                 <MetricCard title="Monthly Revenue" value={m.monthlyRevenue || '$0'} trend="24.1%" isPositive={true} icon={TrendingUp} colorClass="from-brand-500 to-purple-500" delay={0.3} />
-                <MetricCard title="Deployed Tools" value={m.deployedTools?.toLocaleString() || '0'} trend="5.4%" isPositive={true} icon={Activity} colorClass="from-amber-500 to-orange-500" delay={0.4} />
+                <MetricCard title="Deployed Sites" value={m.deployedTools?.toLocaleString() || '0'} trend="5.4%" isPositive={true} icon={Activity} colorClass="from-amber-500 to-orange-500" delay={0.4} />
             </div>
 
             {/* Metric Cards Grid 2 */}

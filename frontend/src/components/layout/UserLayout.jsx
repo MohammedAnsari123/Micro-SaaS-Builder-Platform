@@ -3,14 +3,13 @@ import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-do
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, Users, Database, Settings, Menu, X,
-    CreditCard, LogOut, ChevronRight, Zap, Bell, Search, Store
+    CreditCard, LogOut, ChevronRight, Zap, Bell, Search, Store, Globe
 } from 'lucide-react';
 import axios from 'axios';
 
 const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/tenants', label: 'Tenants', icon: Users },
-    { path: '/marketplace', label: 'Ecosystem', icon: Store },
+    { path: '/sites', label: 'My Websites', icon: Globe },
     { path: '/analytics', label: 'Analytics', icon: Database },
     { path: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
     { path: '/settings', label: 'Global Settings', icon: Settings },

@@ -73,43 +73,7 @@ exports.register = async (req, res, next) => {
         user.tenantId = tenant._id;
         await user.save({ validateBeforeSave: false });
 
-        // 7. NEW: Create a Tool instance by cloning the default template
-        const Tool = require('../models/Tool');
-        const TemplateClone = require('../models/TemplateClone');
-
-        // Create the Tool document
-        const tool = await Tool.create({
-            tenantId: tenant._id,
-            name: `${defaultTemplate.name} (Clone)`,
-            description: defaultTemplate.description,
-            currentVersion: 1,
-            category: defaultTemplate.category || 'General',
-            versions: [{
-                version: 1,
-                pages: defaultTemplate.pages ? defaultTemplate.pages.map(p => ({
-                    name: p.name,
-                    slug: p.slug,
-                    icon: p.icon,
-                    sections: p.sections || []
-                })) : [{ name: 'Dashboard', slug: 'dashboard', icon: 'LayoutDashboard', sections: [] }],
-                layoutConfig: {
-                    type: defaultTemplate.layoutType || 'sidebar',
-                    theme: defaultTemplate.colorTheme || 'blue'
-                },
-                instances: [] // Initial empty state
-            }],
-            isPublic: false
-        });
-
-        // Create the TemplateClone record pointing to the NEW Tool
-        await TemplateClone.create({
-            tenantId: tenant._id,
-            templateId: templateId,
-            toolId: tool._id,
-            templateVersion: 1,
-            cloneSource: 'gallery',
-            templateSnapshotName: defaultTemplate.name
-        });
+        // 7. (Removed outdated Tool creation on user registration)
 
         sendTokenResponse(user, 201, res);
     } catch (err) {

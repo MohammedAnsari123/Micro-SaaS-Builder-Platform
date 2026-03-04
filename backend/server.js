@@ -46,16 +46,23 @@ if (process.env.NODE_ENV === 'development') {
 
 // Mount routers
 app.use('/api/v1/auth', require('./routes/authRoutes'));
-app.use('/api/v1/tools', require('./routes/toolRoutes'));
 app.use('/api/v1/billing', require('./routes/billingRoutes'));
 app.use('/api/v1/analytics', require('./routes/analyticsRoutes'));
-app.use('/api/v1/marketplace', require('./routes/marketplaceRoutes'));
 app.use('/api/v1/webhooks', require('./routes/webhookRoutes'));
 app.use('/api/v1/tenant', require('./routes/tenantRoutes'));
 app.use('/api/v1/templates', require('./routes/templateRoutes'));
 app.use('/api/v1/user', require('./routes/userRoutes'));
-app.use('/api/v1/dynamic/:collectionName', require('./routes/dynamicRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
+
+// CMS Module Routes
+app.use('/api/v1/content', require('./routes/contentRoutes'));
+app.use('/api/v1/contact', require('./routes/contactRoutes'));
+app.use('/api/v1/products', require('./routes/productRoutes'));
+app.use('/api/v1/orders', require('./routes/orderRoutes'));
+app.use('/api/v1/bookings', require('./routes/bookingRoutes'));
+app.use('/api/v1/services', require('./routes/serviceRoutes'));
+app.use('/api/v1/events', require('./routes/eventRoutes'));
+app.use('/api/v1/registrations', require('./routes/registrationRoutes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

@@ -1,5 +1,4 @@
 const Tenant = require('../models/Tenant');
-const Tool = require('../models/Tool');
 
 /**
  * Middleware to load tenant details and attach to req.tenant

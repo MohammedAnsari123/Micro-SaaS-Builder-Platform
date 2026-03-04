@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const Tenant = require('../models/Tenant');
-const Tool = require('../models/Tool');
 const TemplateClone = require('../models/TemplateClone');
 
 // Mock missing Log model
@@ -17,19 +16,17 @@ exports.getDashboardStats = async (req, res, next) => {
     try {
         const tenantId = req.tenantId;
 
-        // 1. Get Deployed Tools
-        const tools = await Tool.find({ tenantId });
-        const toolCount = tools.length;
+        // 1. Get Cloned Templates
+        const clones = await TemplateClone.find({ tenantId });
+        const cloneCount = clones.length;
 
-        // 2. Estimate metrics from tool data (Log model removed)
+        // 2. Estimate metrics
         let totalUsers = 0;
         let totalRevenue = 0;
         let apiRequests = 0;
 
-        tools.forEach(tool => {
-            const currentVerIndex = (tool.currentVersion || 1) - 1;
-            const currentVer = tool.versions && tool.versions[currentVerIndex];
-            const collectionCount = currentVer?.schemas?.length || 0;
+        clones.forEach(clone => {
+            const collectionCount = 3; // mock value
             const toolUsers = (collectionCount * 142) + 50;
             const toolRev = (toolUsers * 2.5);
 
@@ -53,7 +50,7 @@ exports.getDashboardStats = async (req, res, next) => {
                 totalARR: `$${totalRevenue.toLocaleString()}`,
                 activeUsers: totalUsers.toLocaleString(),
                 apiRequests: apiRequests.toLocaleString(),
-                deployedTools: toolCount,
+                deployedTools: cloneCount,
                 apiTraffic
             }
         });
@@ -75,35 +72,30 @@ exports.getMyClonedWebsites = async (req, res, next) => {
         const tenantId = req.tenantId;
 
         const clones = await TemplateClone.find({ tenantId, status: 'active' })
-            .populate('templateId', 'name slug colorTheme category tags description')
-            .populate('toolId', 'name slug versions currentVersion isPublic')
+            .populate('templateId')
             .sort('-clonedAt');
 
-        // Enrich clone data with tool's runtime info
+        const tenant = await Tenant.findById(tenantId);
+
+        // Enrich clone data with template metadata and tenant settings
         const websites = clones.map(clone => {
             const template = clone.templateId;
-            const tool = clone.toolId;
-            const currentVerIndex = (tool?.currentVersion || 1) - 1;
-            const currentVer = tool?.versions?.[currentVerIndex];
-            const collections = currentVer?.schemas?.length || 0;
-            const pages = currentVer?.pages || [];
 
             return {
                 _id: clone._id,
                 cloneId: clone._id,
-                toolId: tool?._id,
-                name: tool?.name || clone.templateSnapshotName || 'Unnamed App',
-                slug: tool?.slug,
+                name: tenant?.siteSettings?.siteName || template?.name || 'My Website',
+                slug: template?.slug,
                 templateName: template?.name || 'Unknown Template',
                 templateSlug: template?.slug,
-                colorTheme: template?.colorTheme || 'blue',
+                colorTheme: template?.theme?.primary ? 'custom' : 'blue', // Placeholder for theme color mapping
                 category: template?.category || 'General',
-                tags: template?.tags || [],
+                tags: [],
                 description: template?.description || '',
-                collections,
-                pages,
-                isPublic: tool?.isPublic || false,
-                cloneSource: clone.cloneSource,
+                collections: template?.modules?.length || 0,
+                pages: template?.pages?.map(p => p.name) || [],
+                isPublic: template?.isPublic || true,
+                cloneSource: clone.cloneSource || 'template',
                 clonedAt: clone.clonedAt,
                 status: clone.status
             };
@@ -115,7 +107,7 @@ exports.getMyClonedWebsites = async (req, res, next) => {
         if (typeof next === 'function') {
             next(err);
         } else {
-            res.status(500).json({ success: false, message: 'Internal Server Error (next missing)', error: err.message });
+            res.status(500).json({ success: false, message: 'Internal Server Error', error: err.message });
         }
     }
 };

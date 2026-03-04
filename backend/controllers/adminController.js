@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const Tenant = require('../models/Tenant');
-const Tool = require('../models/Tool');
 const Template = require('../models/Template');
 const TemplateClone = require('../models/TemplateClone');
 const Subscription = require('../models/Subscription');
@@ -28,7 +27,7 @@ exports.getDashboardMetrics = async (req, res, next) => {
     try {
         const totalUsers = await User.countDocuments();
         const totalTenants = await Tenant.countDocuments();
-        const deployedTools = await Tool.countDocuments();
+        const deployedTools = await TemplateClone.countDocuments();
         const activeSubscriptions = await Subscription.countDocuments({ status: 'active', plan: { $ne: 'free' } });
         const apiUsage = await Log.countDocuments();
 
@@ -139,7 +138,7 @@ exports.getTenants = async (req, res, next) => {
     try {
         const tenants = await Tenant.find().sort('-createdAt');
         const enriched = await Promise.all(tenants.map(async t => {
-            const toolCount = await Tool.countDocuments({ tenantId: t._id });
+            const toolCount = await TemplateClone.countDocuments({ tenantId: t._id });
             return { _id: t._id, name: t.name, plan: t.plan, toolCount, createdAt: t.createdAt };
         }));
         res.status(200).json({ success: true, data: enriched });
@@ -213,64 +212,74 @@ exports.deleteTemplate = async (req, res, next) => {
     }
 };
 
-// @desc    Get marketplace items (cloned templates)
-// @route   GET /api/v1/admin/marketplace
-exports.getMarketplaceItems = async (req, res, next) => {
+// @desc    Get all cloned websites (Ecosystem view)
+// @route   GET /api/v1/admin/clones
+exports.getAllClones = async (req, res, next) => {
     try {
         const clones = await TemplateClone.find()
-            .sort('-clonedAt')
-            .populate('templateId', 'name category price previewUrl')
-            .populate('tenantId', 'name');
+            .populate('templateId', 'name slug category')
+            .populate({
+                path: 'tenantId',
+                select: 'name siteSettings domain ownerId',
+                populate: {
+                    path: 'ownerId',
+                    select: 'email'
+                }
+            })
+            .sort('-clonedAt');
 
-        const enriched = clones.map(c => ({
-            _id: c._id,
-            name: c.templateSnapshotName || c.templateId?.name || 'Cloned Website',
-            creatorName: c.tenantId?.name || 'Unknown',
-            price: c.templateId?.price || 0,
-            rating: 4.8,
-            isPublic: c.status === 'active',
-            templateId: c.templateId?._id
-        }));
-        res.status(200).json({ success: true, data: enriched });
+        const enriched = clones.map(c => {
+            const userEmail = c.tenantId?.ownerId?.email || '';
+            const emailPrefix = userEmail.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            return {
+                _id: c._id,
+                siteName: c.tenantId?.siteSettings?.siteName || c.templateId?.name || 'Untitled',
+                domain: c.tenantId?.name ? `${c.tenantId.name.toLowerCase().replace(/\s+/g, '-')}.microsaas.dev` : '-',
+                owner: c.tenantId?.name || '-',
+                ownerEmail: userEmail,
+                emailPrefix: emailPrefix,
+                template: c.templateId?.name || '-',
+                templateSlug: c.templateId?.slug || '',
+                status: c.status,
+                clonedAt: c.clonedAt
+            };
+        });
+
+        res.status(200).json({ success: true, count: enriched.length, data: enriched });
     } catch (err) {
         if (typeof next === 'function') next(err);
         else res.status(500).json({ success: false, message: err.message });
     }
 };
 
-// @desc    Approve marketplace item (activate clone)
-// @route   PUT /api/v1/admin/marketplace/:id/approve
-exports.approveMarketplaceItem = async (req, res, next) => {
+// @desc    Update clone status (Ban/Unban)
+// @route   PUT /api/v1/admin/clones/:id/status
+exports.updateCloneStatus = async (req, res, next) => {
     try {
-        const clone = await TemplateClone.findById(req.params.id);
-        if (!clone) {
-            return res.status(404).json({ success: false, message: 'Item not found' });
-        }
-        clone.status = 'active';
-        await clone.save();
-        res.status(200).json({ success: true, data: clone });
+        const { status } = req.body;
+        const clone = await TemplateClone.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        if (!clone) return res.status(404).json({ success: false, message: 'Clone not found' });
+        res.status(200).json({ success: true, data: clone, message: `Site status updated to ${status}` });
     } catch (err) {
         if (typeof next === 'function') next(err);
         else res.status(500).json({ success: false, message: err.message });
     }
 };
 
-// @desc    Reject marketplace item (archive/delete clone)
-// @route   PUT /api/v1/admin/marketplace/:id/reject
-exports.rejectMarketplaceItem = async (req, res, next) => {
+// @desc    Remove/Delete clone
+// @route   DELETE /api/v1/admin/clones/:id
+exports.deleteClone = async (req, res, next) => {
     try {
-        const clone = await TemplateClone.findById(req.params.id);
-        if (!clone) {
-            return res.status(404).json({ success: false, message: 'Item not found' });
-        }
-        clone.status = 'deleted';
-        await clone.save();
-        res.status(200).json({ success: true, data: clone });
+        await TemplateClone.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Site removed from ecosystem' });
     } catch (err) {
         if (typeof next === 'function') next(err);
         else res.status(500).json({ success: false, message: err.message });
     }
 };
+
+
 
 // @desc    Get billing data
 // @route   GET /api/v1/admin/billing

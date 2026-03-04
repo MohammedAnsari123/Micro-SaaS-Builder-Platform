@@ -1,6 +1,6 @@
 # 🚀 CodeAra — Micro SaaS Builder Platform
 
-**CodeAra** is a full-stack, multi-tenant SaaS platform that allows users to create, customize, and deploy micro SaaS applications using predefined templates, a dynamic JSON-driven builder engine, and an immersive 3D cinematic landing experience.
+**CodeAra** is a full-stack, multi-tenant SaaS platform that allows users to create, customize, and deploy micro SaaS applications and websites using a **Template-Driven CMS Architecture**. 
 
 > **From idea to deployed product — in one workflow.**
 
@@ -20,30 +20,30 @@ The landing page is a cinematic, scroll-driven 3D experience built with **React 
 | **SaaS Assembly** | 65–82% | Dashboard UI materializes with glow pulse |
 | **Launch** | 82–100% | Panel stands upright — complete product revealed |
 
-Below the fold, the page continues with individually animated sections:
-- **Features** — GSAP staggered entrance + icon micro-loops (pulse/float/spin)
-- **How It Works** — Self-drawing timeline with scale-bounce nodes
-- **Pricing** — rotateY flip-in cards with number roll on toggle
-- **Testimonials** — Alternating slide-in with auto-cycling carousel
-- **FAQ** — Smooth accordion with blue border highlight
-- **Final CTA** — Animated gradient shift with word-by-word reveal
-
 **Mobile (< 768px)**: WebGL replaced with CSS-only 2D fallback hero that auto-plays.
 
 ---
 
-## 📐 Project Overview
+## 📐 Project Overview (Template-Driven CMS)
 
-CodeAra empowers developers and indie hackers to build production-ready micro SaaS products without writing boilerplate. The system separates **Templates** (blueprints) from **Tools** (instances), ensuring data integrity and scalability.
+CodeAra empowers users to build production-ready websites and micro SaaS products instantly by cloning rich, pre-configured templates. 
 
-### Key Capabilities
-- **Template Gallery** — Browse pre-built SaaS blueprints with live preview
-- **One-Click Cloning** — Deep clone layouts, schemas, and configurations into a personal workspace
-- **Visual Builder** — Drag-and-drop JSON-driven editor with real-time preview
-- **Dynamic Rendering Engine** — Maps JSON types to React components at runtime
-- **Multi-Tenant Isolation** — Every resource scoped by `tenantId` with middleware enforcement
-- **Public App Deployment** — Publish and share SaaS apps via vanity URLs
-- **Admin Panel** — Separate dashboard for marketplace moderation, user management, and analytics
+Instead of a complex visual drag-and-drop builder, the platform uses a **Template-Driven CMS approach**:
+1. Users select a template from the gallery.
+2. The template's pages, default content, theme, and module data (e.g., products, services) are cloned to the user's tenant workspace.
+3. Users customize their site via a streamlined Admin Panel (Content Editor, Theme Editor, Module Manager).
+4. A high-performance Template Rendering Engine serves the site to the public.
+
+### Included Templates (10 Configured Blueprints)
+**Informational Templates:**
+- Portfolio, Resume, Digital Agency, Startup Landing, Product Showcase
+
+**Functional Modules (With Backend Logic):**
+- Restaurant / Food Delivery (Menu, Cart, Orders)
+- Car Rental / Booking (Vehicles, Date Selection, Bookings)
+- Service Booking (Services, Appointments)
+- Event Management (Events, Capacity, Registrations)
+- Digital Marketplace (Products, Shopping Cart)
 
 ---
 
@@ -53,24 +53,30 @@ CodeAra empowers developers and indie hackers to build production-ready micro Sa
 
 | Layer | Technologies |
 |---|---|
-| **Frontend** | React 19, Vite, Tailwind CSS, Framer Motion, React Three Fiber, Three.js, GSAP + ScrollTrigger |
-| **Admin Frontend** | React 19, Vite, Tailwind CSS |
+| **Frontend** | React 19, Vite, Tailwind CSS, Framer Motion, React Three Fiber, GSAP |
+| **State/Data** | React Context API, Axios |
 | **Backend** | Node.js, Express.js, Mongoose (MongoDB), JWT Auth, dotenv |
-| **3D Engine** | React Three Fiber, @react-three/drei, Three.js, GSAP ScrollTrigger |
 | **Database** | MongoDB with indexed tenant isolation |
-| **Dev Tools** | Nodemon, Vite HMR, ESLint |
 
-### System Flow
+### System Architecture Diagram
 
 ```mermaid
 graph TD
-    A[Template Blueprint JSON] -->|Clone Process| B[Tool Instance Created]
-    B --> C[Stored in MongoDB per Tenant]
-    C --> D[Builder Loads JSON Config]
-    D --> E[Dynamic Renderer → React Components]
-    E --> F[User Edits in Visual Builder]
-    F -->|Save| G[JSON Persisted to Database]
-    G --> H[Published via Vanity URL]
+    A[Template Gallery] -->|User Selects| B[Clone Template]
+    B --> C[Seed Content to DB]
+    B --> D[Seed Products/Services/Events]
+    B --> E[Copy Theme to Tenant]
+    C --> F[Content Collection]
+    D --> G[Module Collections]
+    E --> H[Tenant Theme]
+    F --> I[Public Site Rendering]
+    G --> I
+    H --> I
+    I --> J["TemplateRenderer (React)"]
+    J --> K[Page Components]
+    F --> L[Admin Panel]
+    G --> L
+    H --> L
 ```
 
 ---
@@ -82,77 +88,47 @@ Micro-SaaS-Builder-Platform/
 ├── frontend/                    # User-facing Application
 │   └── src/
 │       ├── components/
-│       │   ├── 3d/              # Three.js / R3F Components
-│       │   │   ├── Scene.jsx            # GSAP ScrollTrigger + R3F Canvas
-│       │   │   ├── Panel.jsx            # 5-Stage animated 3D panel
-│       │   │   ├── ImmersiveBackground.jsx  # Particle field background
-│       │   │   └── FloatingModules.jsx  # Floating 3D SaaS modules
-│       │   ├── dynamic/         # JSON Rendering Engine
-│       │   │   ├── LayoutRenderer.jsx
-│       │   │   ├── PageRenderer.jsx
-│       │   │   ├── TemplateUIEngine.jsx
-│       │   │   ├── ThemeEngine.jsx
-│       │   │   ├── ToolRegistry.jsx
-│       │   │   ├── NavbarLayout.jsx
-│       │   │   └── SidebarLayout.jsx
-│       │   ├── modules/         # SaaS Component Modules
-│       │   │   ├── CrudTable.jsx
-│       │   │   ├── KanbanBoard.jsx
-│       │   │   ├── ChartDashboard.jsx
-│       │   │   ├── CalendarView.jsx
-│       │   │   └── MetricCards.jsx
-│       │   └── layout/          # App Shell Components
-│       │       ├── Navbar.jsx
-│       │       ├── UserLayout.jsx
-│       │       └── ProtectedRoute.jsx
-│       ├── pages/               # Route-level Pages
-│       │   ├── Landing.jsx          # Cinematic animated landing page
-│       │   ├── Builder.jsx          # Visual drag-and-drop builder
-│       │   ├── DashboardOverview.jsx
-│       │   ├── Marketplace.jsx
-│       │   ├── TemplateGallery.jsx
+│       │   ├── templates/       # Template Rendering Engine
+│       │   │   ├── TemplateRenderer.jsx
+│       │   │   ├── pages/       # (GenericPage, MenuPage, CartPage, etc.)
+│       │   │   └── sections/    # (HeroSection, ContactSection, FooterSection)
+│       │   ├── 3d/              # Landing Page 3D Animations
+│       │   └── layout/          # App Shell (Navbar, ProtectedRoute)
+│       ├── context/             
+│       │   ├── ContentContext.jsx  # Content fetching & caching
+│       │   └── ThemeProvider.jsx   # Dynamic CSS Variables injection
+│       ├── pages/               
+│       │   ├── Landing.jsx          
+│       │   ├── TemplateGallery.jsx  
+│       │   ├── TemplatePreview.jsx  # Live preview with mock context
 │       │   ├── PublicApp.jsx        # Public vanity URL renderer
-│       │   ├── Tenants.jsx
-│       │   ├── Analytics.jsx
-│       │   ├── Subscriptions.jsx
-│       │   ├── GlobalSettings.jsx
-│       │   ├── Login.jsx
-│       │   └── Register.jsx
-│       ├── constants/
-│       │   └── tools.js         # 3D animation tool definitions
-│       ├── App.jsx
-│       └── main.jsx
+│       │   └── admin/               # Tenant Admin Dashboard
+│       │       ├── TenantAdminLayout.jsx
+│       │       ├── ContentEditor.jsx
+│       │       ├── ThemeEditor.jsx
+│       │       ├── ModuleManager.jsx
+│       │       ├── ContactMessages.jsx
+│       │       └── SiteSettingsEditor.jsx
+│       └── App.jsx
 │
 ├── backend/                     # API Server
-│   ├── config/                  # Database & environment config
-│   ├── controllers/             # Business Logic
-│   │   ├── authController.js
-│   │   ├── toolController.js
-│   │   ├── templateController.js
-│   │   ├── dynamicController.js
-│   │   ├── marketplaceController.js
-│   │   ├── adminController.js
-│   │   ├── analyticsController.js
-│   │   ├── billingController.js
-│   │   ├── tenantController.js
-│   │   ├── userController.js
-│   │   └── webhookController.js
+│   ├── controllers/             
+│   │   ├── templateController.js # Template cloning, vanity URL resolution
+│   │   ├── contentController.js  # JSON content chunks
+│   │   ├── productController.js  
+│   │   ├── orderController.js    
+│   │   ├── serviceController.js  
+│   │   └── eventController.js    
 │   ├── models/                  # Mongoose Schemas
-│   │   ├── Template.js, Tool.js, TemplateClone.js
-│   │   ├── User.js, Tenant.js, Admin.js
-│   │   ├── Subscription.js, Review.js
-│   │   ├── Theme.js, Webhook.js
-│   ├── middlewares/             # Auth, Tenant, Analytics, Usage
-│   ├── routes/                  # 11 API route files
-│   ├── schema-engine/           # Dynamic schema compilation
-│   ├── seeders/                 # Database seed scripts
+│   │   ├── Template.js, Tenant.js, Content.js
+│   │   ├── Product.js, Order.js, Booking.js
+│   │   ├── Service.js, Event.js, Registration.js
+│   │   └── ContactMessage.js
+│   ├── routes/                  # API route definitions
+│   ├── seeders/                 
+│   │   ├── seedData.js          # Master content repository
+│   │   └── templateSeeder.js    # Initialization script
 │   └── server.js
-│
-└── admin-frontend/              # Admin Dashboard
-    └── src/
-        ├── pages/               # 11 admin pages
-        ├── layouts/
-        └── utils/
 ```
 
 ---
@@ -161,35 +137,12 @@ Micro-SaaS-Builder-Platform/
 
 | Model | Purpose |
 |---|---|
-| **Template** | Blueprint configs: `layoutJSON`, `schemaConfig`, `routeConfig`, `defaultPages`, `sampleData` |
-| **Tool** | Cloned instances per tenant with `tenantId`, `templateId`, state (preview/live) |
-| **TemplateClone** | Clone activity tracking for analytics and history |
-| **User** | Authentication with JWT, profile, and role management |
-| **Tenant** | Workspace isolation — every resource scoped to tenant |
-| **Admin** | Admin-level users for marketplace moderation |
-| **Subscription** | Plan management (Free / Pro / Team) |
-| **Review** | User reviews and ratings for marketplace templates |
-| **Theme** | Visual theme configs for tenant applications |
-| **Webhook** | Event-driven integrations |
-
----
-
-## 🧩 Dynamic Rendering Engine
-
-The platform uses a **JSON-to-React** rendering pipeline:
-
-```javascript
-// Component Registry maps JSON types to React components
-const componentRegistry = {
-    CrudTable,      // Full CRUD data tables with search, sort, pagination
-    KanbanBoard,    // Drag-and-drop kanban boards
-    ChartDashboard, // Interactive charts with multiple visualization types
-    CalendarView,   // Calendar with event management
-    MetricCards,    // KPI metric cards with trend indicators
-};
-```
-
-The `TemplateUIEngine` processes layout JSON → resolves components → renders a complete SaaS dashboard with sidebar navigation, theming, and responsive layouts.
+| **Template** | Blueprint definitions: `modules`, `pages`, `theme`, and `defaultContent` |
+| **Tenant** | Workspace isolation — every resource is strictly scoped to `tenantId` |
+| **Content** | Flexible key-value store mapping `(page, section)` to JSON data |
+| **Product / Service / Event** | Custom collections for functional template modules |
+| **Order / Booking / Registration** | Transaction records submitted from the public templates |
+| **User** | Authentication with JWT, profile management |
 
 ---
 
@@ -197,13 +150,11 @@ The `TemplateUIEngine` processes layout JSON → resolves components → renders
 
 | Feature | Implementation |
 |---|---|
-| **Authentication** | JWT-based with secure httpOnly cookies |
-| **Tenant Isolation** | Middleware enforces `tenantId` on every DB query |
-| **RBAC** | Role-based access for admin, user, and public routes |
-| **DB Indexing** | Indexes on `tenantId`, `slug`, `templateId` for fast queries |
-| **Input Validation** | Express-validator on all API endpoints |
-| **Rate Limiting** | Usage tracking middleware |
-| **3D Performance** | DPR capped at 1.5, lazy-loaded Three.js, mobile 2D fallback |
+| **Authentication** | JWT-based with secure headers |
+| **Tenant Isolation** | All CRUD endpoints require `tenantId` matching the authenticated user. |
+| **Public vs Private APIs**| Strict separation between `/public/:tenantId` (read-only) and authenticated admin routes. |
+| **Rate Limiting** | Express-rate-limit middleware to prevent abuse. |
+| **Caching** | `ContentContext` minimizes database calls by caching fetched page JSON in React state. |
 
 ---
 
@@ -212,13 +163,17 @@ The `TemplateUIEngine` processes layout JSON → resolves components → renders
 ### Prerequisites
 - Node.js 18+
 - MongoDB (local or Atlas URI)
-- npm or yarn
 
-### 1. Backend
+### 1. Backend Setup & Seeding
 ```bash
 cd backend
 npm install
 cp .env.example .env  # Configure MONGO_URI, JWT_SECRET, PORT
+
+# Crucial: Seed the templates and default content into your database
+node seeders/templateSeeder.js
+
+# Start the server
 npm run dev            # Starts with nodemon on port 5000
 ```
 
@@ -229,49 +184,13 @@ npm install
 npm run dev            # Starts Vite on port 5173
 ```
 
-### 3. Admin Panel
-```bash
-cd admin-frontend
-npm install
-npm run dev            # Starts Vite on port 5174
-```
-
 ### Environment Variables (Backend `.env`)
 ```env
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/saasforge
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_jwt_secret_here
 NODE_ENV=development
 ```
-
----
-
-## 📊 API Routes
-
-| Route Group | Endpoint Base | Description |
-|---|---|---|
-| Auth | `/api/v1/auth` | Register, Login, Token refresh |
-| Tools | `/api/v1/tools` | CRUD for user tool instances |
-| Templates | `/api/v1/templates` | Template management and cloning |
-| Dynamic | `/api/v1/dynamic` | Dynamic schema operations |
-| Marketplace | `/api/v1/marketplace` | Public template marketplace |
-| Tenants | `/api/v1/tenants` | Tenant management |
-| Users | `/api/v1/users` | User profile operations |
-| Analytics | `/api/v1/analytics` | Usage and revenue metrics |
-| Billing | `/api/v1/billing` | Subscription and payment management |
-| Admin | `/api/v1/admin` | Admin dashboard operations |
-| Webhooks | `/api/v1/webhooks` | Event-driven integrations |
-
----
-
-## 🔮 Future Enhancements
-
-- **Template Versioning** — Roll back to previous layout versions
-- **Marketplace Monetization** — Payment processing for template creators
-- **White-Label Support** — Custom domain mapping for tenant tools
-- **Plugin System** — Third-party integrations via custom modules
-- **AI-Powered Builder** — Natural language to SaaS configuration
-- **Real-Time Collaboration** — Multi-user editing with WebSocket sync
 
 ---
 

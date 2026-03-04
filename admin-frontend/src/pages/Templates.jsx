@@ -14,8 +14,8 @@ const Templates = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [createForm, setCreateForm] = useState({
-        name: '', slug: '', description: '', isPremium: false, price: 0, colorTheme: 'indigo',
-        jsonPayload: '{\n  "name": "",\n  "slug": "",\n  "description": "",\n  "isPremium": false,\n  "price": 0,\n  "colorTheme": "indigo",\n  "schemaConfig": {}\n}'
+        name: '', slug: '', description: '', type: 'informational', category: 'General',
+        jsonPayload: '{\n  "name": "",\n  "slug": "",\n  "description": "",\n  "type": "informational",\n  "category": "General",\n  "modules": [],\n  "pages": []\n}'
     });
 
     useEffect(() => { fetchTemplates(); }, []);
@@ -46,8 +46,8 @@ const Templates = () => {
     };
 
     const filtered = templates.filter(t => {
-        if (filter === 'premium') return t.isPremium;
-        if (filter === 'free') return !t.isPremium;
+        if (filter === 'functional') return t.type === 'functional';
+        if (filter === 'informational') return t.type !== 'functional';
         return true;
     });
 
@@ -55,8 +55,8 @@ const Templates = () => {
         setIsEditing(false);
         setEditingId(null);
         setCreateForm({
-            name: '', slug: '', description: '', isPremium: false, price: 0, colorTheme: 'indigo',
-            jsonPayload: '{\n  "name": "",\n  "slug": "",\n  "description": "",\n  "isPremium": false,\n  "price": 0,\n  "colorTheme": "indigo",\n  "schemaConfig": {}\n}'
+            name: '', slug: '', description: '', type: 'informational', category: 'General',
+            jsonPayload: '{\n  "name": "",\n  "slug": "",\n  "description": "",\n  "type": "informational",\n  "category": "General",\n  "modules": [],\n  "pages": []\n}'
         });
         setShowCreateModal(true);
     };
@@ -78,10 +78,10 @@ const Templates = () => {
                     name: createForm.name,
                     slug: createForm.slug,
                     description: createForm.description,
-                    isPremium: createForm.isPremium,
-                    price: Number(createForm.price),
-                    colorTheme: createForm.colorTheme,
-                    schemaConfig: {}
+                    type: createForm.type,
+                    category: createForm.category,
+                    modules: [],
+                    pages: []
                 };
             }
 
@@ -101,8 +101,8 @@ const Templates = () => {
                 setShowCreateModal(false);
                 fetchTemplates();
                 setCreateForm({
-                    name: '', slug: '', description: '', isPremium: false, price: 0, colorTheme: 'indigo',
-                    jsonPayload: '{\n  "name": "",\n  "slug": "",\n  "description": "",\n  "isPremium": false,\n  "price": 0,\n  "colorTheme": "indigo",\n  "schemaConfig": {}\n}'
+                    name: '', slug: '', description: '', type: 'informational', category: 'General',
+                    jsonPayload: '{\n  "name": "",\n  "slug": "",\n  "description": "",\n  "type": "informational",\n  "category": "General",\n  "modules": [],\n  "pages": []\n}'
                 });
             }
         } catch (err) {
@@ -126,9 +126,8 @@ const Templates = () => {
             name: template.name || '',
             slug: template.slug || '',
             description: template.description || '',
-            isPremium: template.isPremium || false,
-            price: template.price || 0,
-            colorTheme: template.colorTheme || 'indigo',
+            type: template.type || 'informational',
+            category: template.category || 'General',
             jsonPayload: JSON.stringify(cleanTemplate, null, 2)
         });
 
@@ -197,7 +196,7 @@ const Templates = () => {
                     className="flex flex-wrap gap-3"
                 >
                     <div className="flex bg-black/20 rounded-xl p-1 border border-white/5 shadow-inner mr-2">
-                        {['all', 'premium', 'free'].map(f => (
+                        {['all', 'functional', 'informational'].map(f => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
@@ -262,11 +261,11 @@ const Templates = () => {
                                     {/* Top Badges */}
                                     <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                                         <div className="flex gap-2">
-                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border shadow-sm ${t.isPremium ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}`}>
-                                                {t.isPremium ? 'Premium' : 'Free'}
+                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border shadow-sm ${t.type === 'functional' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}`}>
+                                                {t.type || 'informational'}
                                             </span>
                                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border shadow-sm bg-black/40 text-white/90 border-white/20`}>
-                                                {Object.keys(t.schemaConfig || {}).length} Colls
+                                                {t.modules?.length || 0} Modules
                                             </span>
                                         </div>
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity -translate-y-2 group-hover:translate-y-0">
@@ -290,18 +289,18 @@ const Templates = () => {
                                     <div className="flex items-center justify-between pt-5 border-t border-white/5">
                                         <div className="flex items-center gap-1.5 text-slate-400 text-xs font-semibold">
                                             <Copy className="w-3.5 h-3.5 text-brand-400" />
-                                            <span className="text-white">{t.clonesCount?.toLocaleString() || 0}</span>
-                                            <span className="uppercase tracking-wider">clones</span>
+                                            <span className="text-white">{t.pages?.length || 0}</span>
+                                            <span className="uppercase tracking-wider">Pages</span>
                                         </div>
                                         <button
-                                            onClick={() => handleToggle(t._id, 'isPremium', !t.isPremium)}
-                                            className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${t.isPremium
-                                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
-                                                : 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20'
+                                            onClick={() => handleToggle(t._id, 'type', t.type === 'functional' ? 'informational' : 'functional')}
+                                            className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${t.type === 'functional'
+                                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20'
+                                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
                                                 }`}
                                         >
-                                            {t.isPremium ? <Box className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />}
-                                            {t.isPremium ? 'Make Free' : 'Make Premium'}
+                                            {t.type === 'functional' ? <Box className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />}
+                                            {t.type === 'functional' ? 'Make Info' : 'Make Functional'}
                                         </button>
                                     </div>
                                 </div>
@@ -416,37 +415,25 @@ const Templates = () => {
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-300">Color Theme</label>
+                                                <label className="text-sm font-medium text-slate-300">Template Type</label>
                                                 <select
-                                                    value={createForm.colorTheme}
-                                                    onChange={(e) => setCreateForm(prev => ({ ...prev, colorTheme: e.target.value }))}
+                                                    value={createForm.type}
+                                                    onChange={(e) => setCreateForm(prev => ({ ...prev, type: e.target.value }))}
                                                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors"
                                                 >
-                                                    <option value="indigo">Indigo</option>
-                                                    <option value="blue">Blue</option>
-                                                    <option value="emerald">Emerald</option>
-                                                    <option value="rose">Rose</option>
-                                                    <option value="amber">Amber</option>
+                                                    <option value="informational">Informational</option>
+                                                    <option value="functional">Functional</option>
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-300">Price (if premium)</label>
+                                                <label className="text-sm font-medium text-slate-300">Category</label>
                                                 <input
-                                                    type="number"
-                                                    value={createForm.price}
-                                                    onChange={(e) => setCreateForm(prev => ({ ...prev, price: e.target.value }))}
+                                                    type="text"
+                                                    value={createForm.category}
+                                                    onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
                                                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors"
                                                 />
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-3 pt-2">
-                                            <div
-                                                onClick={() => setCreateForm(prev => ({ ...prev, isPremium: !prev.isPremium }))}
-                                                className={`w-12 h-6 rounded-full cursor-pointer transition-colors relative ${createForm.isPremium ? 'bg-brand-500' : 'bg-white/10'}`}
-                                            >
-                                                <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${createForm.isPremium ? 'translate-x-7' : 'translate-x-1'}`} />
-                                            </div>
-                                            <span className="text-sm font-medium text-slate-300">Premium Template</span>
                                         </div>
                                     </div>
                                 )}

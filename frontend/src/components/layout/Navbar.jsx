@@ -37,7 +37,7 @@ const Navbar = () => {
 
                 {/* Links */}
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                    <Link to="/templateSites" className="hover:text-white transition-colors duration-200">
+                    <Link to="/templates" className="hover:text-white transition-colors duration-200">
                         Templates
                     </Link>
                     <a href="#features" className="hover:text-white transition-colors duration-200">Features</a>

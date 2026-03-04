@@ -3,15 +3,14 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, Users, Building2, LayoutTemplate, Store,
-    CreditCard, Bot, BarChart3, Shield, Settings, Menu, X, LogOut, Zap, Bell, Search, ChevronRight
+    CreditCard, Bot, BarChart3, Shield, Settings, Menu, X, LogOut, Zap, Bell, Search, ChevronRight, Globe
 } from 'lucide-react';
 
 const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/users', label: 'Users', icon: Users },
     { path: '/tenants', label: 'Tenants', icon: Building2 },
-    { path: '/templates', label: 'Templates', icon: LayoutTemplate },
-    { path: '/marketplace', label: 'Marketplace', icon: Store },
+    { path: '/ecosystem', label: 'All Sites', icon: Globe },
     { path: '/billing', label: 'Billing', icon: CreditCard },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/security', label: 'Security', icon: Shield },
