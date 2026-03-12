@@ -7,6 +7,8 @@ import ContentContext from '../context/ContentContext';
 import ThemeProvider from '../context/ThemeProvider';
 import TemplateRenderer from '../components/templates/TemplateRenderer';
 
+import '../styles/preview.css';
+
 const TemplatePreview = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
@@ -81,27 +83,27 @@ const TemplatePreview = () => {
     };
 
     return (
-        <div className="bg-slate-900 min-h-screen flex flex-col">
+        <div className="preview-page">
             {/* Top Toolbar */}
-            <div className="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0 z-50">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/templates')} className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+            <div className="preview-toolbar">
+                <div className="preview-toolbar-left">
+                    <button onClick={() => navigate('/templates')} className="btn-preview-back">
                         <ArrowLeft size={20} />
-                        <span className="font-medium hidden sm:inline">Back to Gallery</span>
+                        <span>Back to Gallery</span>
                     </button>
-                    <div className="h-6 w-px bg-slate-700 mx-2"></div>
-                    <h1 className="text-white font-bold">{template.name} <span className="text-slate-400 font-normal ml-2 hidden sm:inline">Preview</span></h1>
+                    <div className="preview-toolbar-divider"></div>
+                    <h1 className="preview-title">{template.name} <span className="preview-title-badge">Preview</span></h1>
                 </div>
 
                 {/* Viewport Toggles */}
-                <div className="flex items-center bg-slate-900 p-1 rounded-lg border border-slate-700 hidden md:flex">
-                    <button onClick={() => setViewMode('desktop')} className={`p-2 rounded-md transition-colors ${viewMode === 'desktop' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}>
+                <div className="preview-viewport-toggles">
+                    <button onClick={() => setViewMode('desktop')} className={`btn-viewport-toggle ${viewMode === 'desktop' ? 'active' : ''}`}>
                         <Monitor size={18} />
                     </button>
-                    <button onClick={() => setViewMode('tablet')} className={`p-2 rounded-md transition-colors ${viewMode === 'tablet' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}>
+                    <button onClick={() => setViewMode('tablet')} className={`btn-viewport-toggle ${viewMode === 'tablet' ? 'active' : ''}`}>
                         <Tablet size={18} />
                     </button>
-                    <button onClick={() => setViewMode('mobile')} className={`p-2 rounded-md transition-colors ${viewMode === 'mobile' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}>
+                    <button onClick={() => setViewMode('mobile')} className={`btn-viewport-toggle ${viewMode === 'mobile' ? 'active' : ''}`}>
                         <Smartphone size={18} />
                     </button>
                 </div>
@@ -121,14 +123,14 @@ const TemplatePreview = () => {
                             alert(err.response?.data?.message || 'Failed to clone template');
                             if (err.response?.status === 401) navigate('/login');
                         });
-                    }} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors shadow-lg shadow-blue-500/20">
+                    }} className="btn-use-template">
                         Use Template
                     </button>
                 </div>
             </div>
 
             {/* Preview Area */}
-            <div className="flex-1 bg-slate-950 overflow-auto flex items-center justify-center p-4 sm:p-8">
+            <div className="preview-area">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}

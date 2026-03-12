@@ -6,21 +6,17 @@
 
 ---
 
-## 🎬 Interactive 3D Landing Page
+## 🎬 Interactive Landing Page
 
-The landing page is a cinematic, scroll-driven 3D experience built with **React Three Fiber** and **GSAP ScrollTrigger**. It tells the product story through motion:
+The landing page provides a clean, fast, and modern scroll-driven experience built with **GSAP ScrollTrigger** and **Framer Motion**, showcasing the core value:
 
 **Idea → Build → Integrate → Launch**
 
-| Stage | Scroll Range | Animation |
-|---|---|---|
-| **Hero Entry** | 0% | 3D panel floats with idle oscillation, headline + CTA visible |
-| **Flatten** | 20–40% | Panel rotates flat on X-axis, camera shifts overhead |
-| **Tool Integration** | 40–65% | 5 tool icons fly in and snap with spring bounce |
-| **SaaS Assembly** | 65–82% | Dashboard UI materializes with glow pulse |
-| **Launch** | 82–100% | Panel stands upright — complete product revealed |
-
-**Mobile (< 768px)**: WebGL replaced with CSS-only 2D fallback hero that auto-plays.
+| Stage | Animation |
+|---|---|
+| **Hero Entry** | Dynamic text reveal of the main value proposition |
+| **Features** | Staggered fade-up of core platform capabilities |
+| **Pricing** | Clean, transparent pricing tier display |
 
 ---
 
@@ -31,8 +27,13 @@ CodeAra empowers users to build production-ready websites and micro SaaS product
 Instead of a complex visual drag-and-drop builder, the platform uses a **Template-Driven CMS approach**:
 1. Users select a template from the gallery.
 2. The template's pages, default content, theme, and module data (e.g., products, services) are cloned to the user's tenant workspace.
-3. Users customize their site via a streamlined Admin Panel (Content Editor, Theme Editor, Module Manager).
+3. Users customize their site via a sleek, Vercel-style **Admin Panel** featuring a **Dynamic Content Editor** (auto-generating UI inputs to avoid raw JSON), Theme Editor, and Module Manager.
 4. A high-performance Template Rendering Engine serves the site to the public.
+
+### ✨ Recent UI/UX Upgrades
+- **Modern Light Theme**: Completely migrated from a dark neon GUI to a pristine, minimal, and high-performance Light Theme.
+- **Vercel-Style Admin Layout**: Replaced bulky sidebars with a sleek, top-nav settings layout for managing tenant sites.
+- **Dynamic Array Content Editing**: The CMS parses complex JSON structures and provides graphical inputs with one-click "Add Item" and "Remove Item" array manipulation tools.
 
 ### Included Templates (10 Configured Blueprints)
 **Informational Templates:**

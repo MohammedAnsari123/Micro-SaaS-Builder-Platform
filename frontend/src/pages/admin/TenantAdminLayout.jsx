@@ -14,6 +14,7 @@ import ContactMessages from './ContactMessages';
 import ModuleManager from './ModuleManager';
 
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import '../../styles/admin.css';
 
 const API_BASE = 'http://localhost:5000/api/v1';
 
@@ -97,118 +98,71 @@ const TenantAdminLayout = ({ token, onLogout }) => {
 
     if (loading) {
         return (
-            <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
-                <p style={{ color: '#94a3b8' }}>Loading admin panel...</p>
+            <div className="admin-layout-modern" style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <p style={{ color: '#6b7280' }}>Loading settings...</p>
             </div>
         );
     }
 
     return (
-        <div style={{ display: 'flex', height: '100vh', backgroundColor: '#f8fafc', color: '#1e293b' }}>
-            {/* Sidebar */}
-            <aside style={{
-                width: sidebarCollapsed ? '64px' : '240px',
-                backgroundColor: '#0f172a',
-                color: '#fff',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'width 0.3s',
-                overflow: 'hidden',
-                flexShrink: 0
-            }}>
-                {/* Header */}
-                <div style={{ padding: '20px 16px', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    {!sidebarCollapsed && (
-                        <div>
-                            <h3 style={{ fontWeight: 800, fontSize: '16px', color: '#fff' }}>Admin Panel</h3>
-                            {template && <p style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>{template.name}</p>}
-                        </div>
-                    )}
-                    <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px' }}>
-                        {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-                    </button>
+        <div className="admin-layout-modern">
+            {/* Top Header */}
+            <header className="admin-header-modern">
+                <div className="admin-header-left">
+                    <Link to="/sites" className="admin-header-logo" style={{ textDecoration: 'none' }}>
+                        <LayoutDashboard size={20} />
+                        CodeAra Admin
+                    </Link>
+                    <div className="admin-header-divider" />
+                    <div className="admin-header-project">
+                        {template ? template.name : 'Manage Site'}
+                    </div>
                 </div>
-
-                {/* Nav Items */}
-                <nav style={{ flex: 1, padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {/* Public Site Link */}
+                
+                <div className="admin-header-right">
                     {template && (
-                        <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '12px',
-                                padding: sidebarCollapsed ? '10px' : '10px 12px',
-                                borderRadius: '12px', border: '1px solid #1e293b',
-                                cursor: 'pointer', backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                color: '#60a5fa', marginBottom: '12px', textDecoration: 'none',
-                                transition: 'all 0.2s', fontSize: '14px', fontWeight: 700,
-                                justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
-                            }}>
-                            <Globe size={18} />
-                            {!sidebarCollapsed && 'See Live Site'}
+                        <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="admin-header-btn secondary">
+                            <Globe size={16} /> Live Proof
                         </a>
                     )}
+                    <Link to="/sites" className="admin-header-btn primary">
+                        <LayoutDashboard size={16} /> Dashboard
+                    </Link>
+                    {onLogout && (
+                        <button onClick={onLogout} className="admin-header-btn danger">
+                            <LogOut size={16} /> Logout
+                        </button>
+                    )}
+                </div>
+            </header>
+
+            {/* Main Container */}
+            <div className="admin-container-modern">
+                {/* Left Sidebar Nav */}
+                <aside className="admin-sidebar-modern">
                     {menuItems.map(item => {
                         const Icon = item.icon;
                         const isActive = activePage === item.key;
                         return (
-                            <button key={item.key} onClick={() => setActivePage(item.key)}
-                                style={{
-                                    display: 'flex', alignItems: 'center', gap: '12px',
-                                    padding: sidebarCollapsed ? '10px' : '10px 12px',
-                                    borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                    backgroundColor: isActive ? '#1e293b' : 'transparent',
-                                    color: isActive ? '#fff' : '#94a3b8',
-                                    fontWeight: isActive ? 600 : 400,
-                                    fontSize: '14px', textAlign: 'left', width: '100%',
-                                    transition: 'all 0.2s',
-                                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
-                                }}>
-                                <Icon size={18} />
-                                {!sidebarCollapsed && item.label}
+                            <button 
+                                key={item.key} 
+                                onClick={() => setActivePage(item.key)}
+                                className={`admin-nav-item-modern ${isActive ? 'active' : ''}`}
+                            >
+                                <Icon size={16} />
+                                {item.label}
                             </button>
                         );
                     })}
-                </nav>
+                </aside>
 
-                {/* Dashboard & Logout */}
-                <div style={{ padding: '12px 8px', borderTop: '1px solid #1e293b', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <Link to="/sites"
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '12px',
-                            padding: '10px 12px', borderRadius: '8px', border: 'none',
-                            cursor: 'pointer', backgroundColor: 'transparent',
-                            color: '#94a3b8', fontSize: '14px', width: '100%', textAlign: 'left',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s',
-                            justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
-                        }}>
-                        <LayoutDashboard size={18} />
-                        {!sidebarCollapsed && 'Back to Dashboard'}
-                    </Link>
-
-                    {onLogout && (
-                        <button onClick={onLogout}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '12px',
-                                padding: '10px 12px', borderRadius: '8px', border: 'none',
-                                cursor: 'pointer', backgroundColor: 'transparent',
-                                color: '#ef4444', fontSize: '14px', width: '100%', textAlign: 'left',
-                                justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
-                            }}>
-                            <LogOut size={18} />
-                            {!sidebarCollapsed && 'Logout'}
-                        </button>
-                    )}
-                </div>
-            </aside>
-
-            {/* Main Content */}
-            <main style={{ flex: 1, overflow: 'auto', padding: '32px' }}>
-                <motion.div key={activePage} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-                    {renderPage()}
-                </motion.div>
-            </main>
+                {/* Right Content */}
+                <main className="admin-content-modern" style={{ overflowY: 'visible', padding: '0' }}>
+                    <motion.div key={activePage} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                        {renderPage()}
+                    </motion.div>
+                </main>
+            </div>
         </div>
     );
 };

@@ -17,11 +17,12 @@ export const ContentProvider = ({ tenantId, cloneId, template, theme, siteSettin
 
     // Fetch content for a specific page
     const fetchPageContent = useCallback(async (page) => {
+        if (!tenantId || !cloneId || tenantId === 'undefined' || cloneId === 'undefined') return {};
         if (contentMap[page]) return contentMap[page];
 
         try {
             setLoading(true);
-            const res = await axios.get(`${API_BASE}/content/public/${tenantId}?page=${page}`);
+            const res = await axios.get(`${API_BASE}/content/public/${tenantId}/${cloneId}?page=${page}`);
             if (res.data.success) {
                 const sections = {};
                 res.data.data.forEach(item => {
@@ -36,7 +37,7 @@ export const ContentProvider = ({ tenantId, cloneId, template, theme, siteSettin
             setLoading(false);
         }
         return {};
-    }, [tenantId, contentMap]);
+    }, [tenantId, cloneId, contentMap]);
 
     // Get content for a page (returns cached or empty)
     const getPageContent = useCallback((page) => {

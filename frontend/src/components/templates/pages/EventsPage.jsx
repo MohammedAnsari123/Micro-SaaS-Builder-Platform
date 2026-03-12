@@ -12,6 +12,7 @@ const EventsPage = () => {
 
     useEffect(() => {
         const fetch = async () => {
+            if (!tenantId || !cloneId || tenantId === 'undefined' || cloneId === 'undefined') return;
             try {
                 const url = tenantId === 'preview'
                     ? `http://localhost:5000/api/v1/events/public/preview?template=${template.slug}`
@@ -25,7 +26,7 @@ const EventsPage = () => {
             }
         };
         fetch();
-    }, [tenantId]);
+    }, [tenantId, cloneId]);
 
     const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 

@@ -13,6 +13,7 @@ const ServiceListPage = () => {
 
     useEffect(() => {
         const fetch = async () => {
+            if (!tenantId || !cloneId || tenantId === 'undefined' || cloneId === 'undefined') return;
             try {
                 const url = tenantId === 'preview'
                     ? `http://localhost:5000/api/v1/services/public/preview?template=${template.slug}`
@@ -26,7 +27,7 @@ const ServiceListPage = () => {
             }
         };
         fetch();
-    }, [tenantId]);
+    }, [tenantId, cloneId]);
 
     const categories = ['All', ...new Set(services.map(s => s.category))];
     const filtered = activeCategory === 'All' ? services : services.filter(s => s.category === activeCategory);

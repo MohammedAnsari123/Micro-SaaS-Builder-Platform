@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, TrendingUp, ArrowUpRight, Loader2, RefreshCw, DollarSign, ListOrdered, Wallet, Receipt } from 'lucide-react';
 import axios from 'axios';
+import './feature-pages.css';
 
 const API = 'http://localhost:5000/api/v1';
 
@@ -26,12 +27,8 @@ const Billing = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh] relative z-10">
-                <div className="relative">
-                    <div className="w-16 h-16 rounded-full border-t-2 border-brand-500 border-l-2 border-transparent animate-spin" />
-                    <div className="w-16 h-16 rounded-full border-r-2 border-emerald-500 border-b-2 border-transparent animate-spin absolute inset-0 animation-delay-500" />
-                    <CreditCard className="w-6 h-6 text-brand-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-                </div>
+            <div className="flex-center" style={{ minHeight: '60vh', position: 'relative', zIndex: 10 }}>
+                <div className="admin-loader"></div>
             </div>
         );
     }
@@ -39,28 +36,28 @@ const Billing = () => {
     const b = billing || {};
 
     return (
-        <div className="space-y-8 relative z-10 pb-10">
+        <div className="feature-page-container">
             {/* Header Content */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-gradient-to-r from-brand-600/10 to-emerald-600/10 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
+            <div className="page-header-panel bg-brand-emerald">
                 <div>
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="flex items-center gap-3 mb-2"
+                        className="header-title-box"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-emerald-500 p-[1px]">
-                            <div className="w-full h-full bg-[#0f172a] rounded-[10px] flex items-center justify-center">
-                                <Wallet className="w-5 h-5 text-emerald-400" />
+                        <div className="header-icon-wrapper bg-brand-emerald">
+                            <div className="header-icon-inner">
+                                <Wallet className="w-5 h-5" style={{ color: 'var(--color-success)' }} />
                             </div>
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Revenue Operations</h1>
+                        <h1 className="page-title">Revenue Operations</h1>
                     </motion.div>
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-slate-400 font-medium ml-1"
+                        className="page-subtitle"
                     >
                         Monitor platform revenue, active subscriptions, and cash flow
                     </motion.p>
@@ -71,68 +68,66 @@ const Billing = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 }}
                     onClick={fetchBilling}
-                    className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-all flex items-center gap-2 group shadow-lg"
+                    className="btn-refresh"
                 >
-                    <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500 text-emerald-400" />
-                    <span className="text-sm font-bold">Refresh Finances</span>
+                    <RefreshCw className="icon" style={{ color: 'var(--color-success)' }} />
+                    <span className="btn-refresh-text">Refresh Finances</span>
                 </motion.button>
             </div>
 
             {/* Revenue Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="metrics-grid metrics-grid-3">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                    className="glass-panel p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">
-                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-500/20 rounded-full blur-[40px]" />
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                        <span className="text-slate-400 text-sm font-medium">Platform Total Volume</span>
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                            <DollarSign className="w-5 h-5 text-emerald-400" />
+                    className="metric-card metric-card-emerald">
+                    <div className="metric-glow glow-emerald" />
+                    <div className="metric-header">
+                        <span className="metric-title">Platform Total Volume</span>
+                        <div className="metric-icon-box box-emerald">
+                            <DollarSign className="metric-icon icon-emerald" />
                         </div>
                     </div>
-                    <h3 className="text-4xl font-black text-white tracking-tight relative z-10 flex items-start gap-1">
-                        <span className="text-2xl text-emerald-500 mt-1">$</span>
-                        {((b.totalRevenue || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <h3 className="metric-value value-emerald-currency">
+                        ${((b.totalRevenue || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-3 relative z-10 bg-white/5 w-max px-2.5 py-1 rounded-lg border border-white/10">
-                        <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Lifetime Gross</span>
+                    <div className="metric-footer footer-emerald">
+                        <TrendingUp className="footer-icon" />
+                        <span className="footer-text">Lifetime Gross</span>
                     </div>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    className="glass-panel p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all">
-                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-blue-500/20 rounded-full blur-[40px]" />
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                        <span className="text-slate-400 text-sm font-medium">Monthly Recuring (MRR)</span>
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                            <TrendingUp className="w-5 h-5 text-blue-400" />
+                    className="metric-card metric-card-blue">
+                    <div className="metric-glow glow-blue" />
+                    <div className="metric-header">
+                        <span className="metric-title">Monthly Recuring (MRR)</span>
+                        <div className="metric-icon-box box-blue">
+                            <TrendingUp className="metric-icon icon-blue" />
                         </div>
                     </div>
-                    <h3 className="text-4xl font-black text-white tracking-tight relative z-10 flex items-start gap-1">
-                        <span className="text-2xl text-blue-500 mt-1">$</span>
-                        {((b.monthlyRevenue || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <h3 className="metric-value value-blue-currency">
+                        ${((b.monthlyRevenue || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-3 relative z-10 bg-white/5 w-max px-2.5 py-1 rounded-lg border border-white/10">
-                        <ArrowUpRight className="w-3.5 h-3.5 text-blue-400" />
-                        <span className="text-blue-400 text-xs font-bold uppercase tracking-wider">Current Month</span>
+                    <div className="metric-footer footer-blue">
+                        <ArrowUpRight className="footer-icon" />
+                        <span className="footer-text">Current Month</span>
                     </div>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                    className="glass-panel p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-brand-500/30 transition-all">
-                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-brand-500/20 rounded-full blur-[40px]" />
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                        <span className="text-slate-400 text-sm font-medium">Active Subscriptions</span>
-                        <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                            <CreditCard className="w-5 h-5 text-brand-400" />
+                    className="metric-card metric-card-brand">
+                    <div className="metric-glow glow-brand" />
+                    <div className="metric-header">
+                        <span className="metric-title">Active Subscriptions</span>
+                        <div className="metric-icon-box box-brand">
+                            <CreditCard className="metric-icon icon-brand" />
                         </div>
                     </div>
-                    <h3 className="text-4xl font-black text-white tracking-tight relative z-10">
+                    <h3 className="metric-value">
                         {(b.activeSubscriptions || 0).toLocaleString()}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-3 relative z-10 bg-white/5 w-max px-2.5 py-1 rounded-lg border border-white/10">
-                        <ListOrdered className="w-3.5 h-3.5 text-brand-400" />
-                        <span className="text-brand-400 text-xs font-bold uppercase tracking-wider">Paid Tiers</span>
+                    <div className="metric-footer footer-brand">
+                        <ListOrdered className="footer-icon" />
+                        <span className="footer-text">Paid Tiers</span>
                     </div>
                 </motion.div>
             </div>
@@ -142,38 +137,36 @@ const Billing = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="glass-panel rounded-3xl overflow-hidden shadow-2xl relative"
+                className="feature-table-panel"
             >
-                <div className="absolute top-0 right-1/2 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
-
-                <div className="p-6 border-b border-white/5 flex items-center gap-3 relative z-10 bg-black/20">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                        <Receipt className="w-4 h-4 text-emerald-400" />
+                <div className="table-header-box">
+                    <div className="table-header-icon" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', boxShadow: '0 0 10px rgba(16, 185, 129, 0.2)' }}>
+                        <Receipt style={{ width: '1rem', height: '1rem', color: '#10b981' }} />
                     </div>
-                    <h2 className="text-xl font-bold text-white">Latest Transactions</h2>
+                    <h2 className="table-title">Latest Transactions</h2>
                 </div>
 
-                <div className="overflow-x-auto relative z-10 custom-scrollbar pb-2">
-                    <table className="w-full text-left text-sm border-collapse">
+                <div className="data-table-wrapper custom-scrollbar pb-2">
+                    <table className="admin-data-table">
                         <thead>
-                            <tr className="bg-black/40 border-b border-white/5 text-slate-400 uppercase tracking-wider text-[11px] font-bold">
-                                <th className="p-5 font-semibold">Customer / Alias</th>
-                                <th className="p-5 font-semibold">Payment Amount</th>
-                                <th className="p-5 font-semibold">Subscribed Plan</th>
-                                <th className="p-5 font-semibold text-right">Settlement Date</th>
+                            <tr>
+                                <th>Customer / Alias</th>
+                                <th>Payment Amount</th>
+                                <th>Subscribed Plan</th>
+                                <th style={{ textAlign: 'right' }}>Settlement Date</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody>
                             <AnimatePresence>
                                 {(!b.transactions || b.transactions.length === 0) ? (
                                     <tr>
                                         <td colSpan="4">
-                                            <div className="py-20 text-center">
-                                                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                                                    <CreditCard className="w-8 h-8 text-slate-500" />
+                                            <div className="empty-state-large">
+                                                <div className="empty-icon-circle">
+                                                    <CreditCard style={{ width: '2rem', height: '2rem', color: 'var(--color-primary-500)' }} />
                                                 </div>
-                                                <h3 className="text-lg font-bold text-white mb-2">No Transactions Found</h3>
-                                                <p className="text-slate-400 font-medium">When tenants make payments, they will appear here.</p>
+                                                <h3 className="empty-title">No Transactions Found</h3>
+                                                <p className="empty-desc">When tenants make payments, they will appear here.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -185,24 +178,24 @@ const Billing = () => {
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
                                             transition={{ duration: 0.3, delay: index * 0.05 }}
-                                            className="hover:bg-white/[0.03] transition-colors group relative"
+                                            className="table-row group"
                                         >
                                             <td className="p-5">
-                                                <span className="font-bold text-white group-hover:text-emerald-300 transition-colors">
+                                                <span className="user-name-text group-hover:text-emerald-500">
                                                     {tx.user || '-'}
                                                 </span>
                                             </td>
                                             <td className="p-5">
-                                                <div className="font-bold text-emerald-400 text-base">
+                                                <div style={{ fontWeight: 700, color: 'var(--color-success)', fontSize: '1rem' }}>
                                                     ${((tx.amount || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </div>
                                             </td>
                                             <td className="p-5">
-                                                <span className="inline-flex items-center px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                                                <span className="badge badge-admin">
                                                     {tx.plan || '-'}
                                                 </span>
                                             </td>
-                                            <td className="p-5 text-slate-400 font-medium text-right text-xs">
+                                            <td className="p-5" style={{ color: 'var(--color-primary-500)', fontWeight: 500, textAlign: 'right', fontSize: '0.75rem' }}>
                                                 {tx.date ? new Date(tx.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
                                             </td>
                                         </motion.tr>

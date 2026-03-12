@@ -16,6 +16,7 @@ const BookingPage = () => {
 
     useEffect(() => {
         const fetchItems = async () => {
+            if (!tenantId || !cloneId || tenantId === 'undefined' || cloneId === 'undefined') return;
             try {
                 if (template.modules?.includes('service')) {
                     const url = tenantId === 'preview'
@@ -36,7 +37,7 @@ const BookingPage = () => {
             }
         };
         fetchItems();
-    }, [tenantId]);
+    }, [tenantId, cloneId]);
 
     const bookableItems = services.length > 0 ? services : products;
 

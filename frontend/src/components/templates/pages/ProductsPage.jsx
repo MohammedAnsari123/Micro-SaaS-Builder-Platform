@@ -13,6 +13,7 @@ const ProductsPage = ({ addToCart }) => {
 
     useEffect(() => {
         const fetch = async () => {
+            if (!tenantId || !cloneId || tenantId === 'undefined' || cloneId === 'undefined') return;
             try {
                 const url = tenantId === 'preview'
                     ? `http://localhost:5000/api/v1/products/public/preview?template=${template.slug}`
@@ -26,7 +27,7 @@ const ProductsPage = ({ addToCart }) => {
             }
         };
         fetch();
-    }, [tenantId]);
+    }, [tenantId, cloneId]);
 
     const categories = ['All', ...new Set(products.map(p => p.category))];
     const filtered = activeCategory === 'All' ? products : products.filter(p => p.category === activeCategory);

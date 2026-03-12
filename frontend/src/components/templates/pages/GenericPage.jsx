@@ -9,8 +9,9 @@ const GenericPage = ({ pageSlug }) => {
     const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
+        setLoaded(false);
         fetchPageContent(pageSlug).then(() => setLoaded(true));
-    }, [pageSlug]);
+    }, [pageSlug, fetchPageContent]);
 
     const sections = getPageContent(pageSlug);
 

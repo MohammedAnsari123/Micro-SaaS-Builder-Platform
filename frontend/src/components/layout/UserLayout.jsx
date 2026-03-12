@@ -6,6 +6,7 @@ import {
     CreditCard, LogOut, ChevronRight, Zap, Bell, Search, Store, Globe
 } from 'lucide-react';
 import axios from 'axios';
+import '../../styles/user-layout.css';
 
 const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -54,17 +55,17 @@ const UserLayout = () => {
 
     if (loading) {
         return (
-            <div className="h-screen bg-slate-950 flex items-center justify-center text-white font-sans">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-t-2 border-blue-500 border-r-2 border-transparent rounded-full animate-spin" />
-                    <p className="text-slate-400 font-medium animate-pulse">Initializing SaaS Forge...</p>
+            <div className="admin-loading">
+                <div className="admin-loading-content">
+                    <div className="admin-loading-spinner" />
+                    <p className="admin-loading-text">Initializing SaaS Forge...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="h-screen flex overflow-hidden bg-slate-950 font-sans text-slate-300 relative">
+        <div className="admin-layout">
             {/* Sidebar */}
             <AnimatePresence>
                 {sidebarOpen && (
@@ -72,40 +73,37 @@ const UserLayout = () => {
                         initial={{ width: 0, opacity: 0 }}
                         animate={{ width: 280, opacity: 1 }}
                         exit={{ width: 0, opacity: 0 }}
-                        className="bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 overflow-hidden relative z-50"
+                        className="admin-sidebar"
                     >
                         {/* Sidebar Header */}
                         <Link to='/'>
-                            <div className="p-6 border-b border-slate-800 flex items-center gap-3 shrink-0">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                    <Zap className="w-5 h-5 text-white fill-white" />
+                            <div className="admin-sidebar-header">
+                                <div className="admin-logo-icon">
+                                    <Zap size={20} color="#ffffff" fill="#ffffff" />
                                 </div>
-                                <span className="font-bold text-xl text-white tracking-tight">SaaS<span className="text-blue-500">Forge</span></span>
+                                <span className="admin-logo-text">SaaS<span className="admin-logo-highlight">Forge</span></span>
                             </div>
                         </Link>
 
                         {/* Nav Items */}
-                        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto custom-scrollbar relative">
+                        <nav className="admin-nav custom-scrollbar">
                             {navItems.map(({ path, label, icon: Icon }) => (
                                 <NavLink
                                     key={path}
                                     to={path}
                                     className={({ isActive }) =>
-                                        `group flex items-center justify-between px-4 py-3 rounded-xl font-medium transition-all duration-300 relative ${isActive
-                                            ? 'bg-blue-500/10 text-white border border-blue-500/20 shadow-inner'
-                                            : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                                        }`
+                                        `admin-nav-item ${isActive ? 'active' : ''}`
                                     }
                                 >
                                     {({ isActive }) => (
                                         <>
-                                            <div className="flex items-center gap-3">
-                                                <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-blue-400' : 'group-hover:text-blue-400/70'}`} />
-                                                <span className="text-[15px]">{label}</span>
+                                            <div className="admin-nav-item-content">
+                                                <Icon className="admin-nav-icon" />
+                                                <span>{label}</span>
                                             </div>
                                             {isActive && (
                                                 <motion.div layoutId="nav-indicator">
-                                                    <ChevronRight className="w-4 h-4 text-blue-500" />
+                                                    <ChevronRight size={16} color="var(--color-secondary)" />
                                                 </motion.div>
                                             )}
                                         </>
@@ -115,23 +113,23 @@ const UserLayout = () => {
                         </nav>
 
                         {/* Sidebar Footer (Dynamic User Info) */}
-                        <div className="p-4 border-t border-slate-800 shrink-0 bg-slate-900/50 backdrop-blur-md">
-                            <div className="flex items-center gap-3 mb-4 p-2">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-blue-500 p-[2px] shadow-lg shadow-indigo-500/10">
-                                    <div className="w-full h-full bg-slate-800 rounded-[8px] overflow-hidden flex items-center justify-center">
-                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Owner'}`} alt="Avatar" className="w-8 h-8" />
+                        <div className="admin-sidebar-footer">
+                            <div className="admin-user-profile">
+                                <div className="admin-user-avatar">
+                                    <div className="admin-user-avatar-inner">
+                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Owner'}`} alt="Avatar" className="admin-user-avatar-img" />
                                     </div>
                                 </div>
-                                <div className="overflow-hidden">
-                                    <div className="text-sm font-bold text-white truncate">{user?.name || 'Admin User'}</div>
-                                    <div className="text-[11px] text-slate-500 font-medium truncate uppercase tracking-wider">{user?.email || 'Owner Role'}</div>
+                                <div className="admin-user-info">
+                                    <div className="admin-user-name">{user?.name || 'Admin User'}</div>
+                                    <div className="admin-user-role">{user?.email || 'Owner Role'}</div>
                                 </div>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/5 rounded-xl text-sm font-semibold transition-all border border-transparent hover:border-rose-500/10"
+                                className="admin-logout-btn"
                             >
-                                <LogOut className="w-4 h-4" /> Sign Out
+                                <LogOut className="admin-logout-btn-icon" /> Sign Out
                             </button>
                         </div>
                     </motion.aside>
@@ -139,40 +137,40 @@ const UserLayout = () => {
             </AnimatePresence>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+            <main className="admin-main">
                 {/* Header Navbar */}
-                <header className="h-20 px-8 border-b border-slate-800 flex items-center justify-between bg-slate-950/50 backdrop-blur-xl sticky top-0 z-40 shrink-0">
-                    <div className="flex items-center gap-4">
+                <header className="admin-header">
+                    <div className="admin-header-left">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="p-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-all border border-slate-700/50 group"
+                            className="admin-menu-toggle"
                         >
-                            {sidebarOpen ? <X className="w-5 h-5 group-hover:rotate-90 transition-transform" /> : <Menu className="w-5 h-5" />}
+                            {sidebarOpen ? <X className="admin-menu-icon admin-menu-icon-close" /> : <Menu className="admin-menu-icon" />}
                         </button>
-                        <div>
-                            <h2 className="text-white font-bold text-lg leading-tight uppercase tracking-widest text-[11px] text-blue-500 mb-0.5">Control Panel</h2>
-                            <h1 className="text-xl font-bold text-white tracking-tight">Platform Overview</h1>
+                        <div className="admin-header-title-wrapper">
+                            <h2 className="admin-header-subtitle">Control Panel</h2>
+                            <h1 className="admin-header-title">Platform Overview</h1>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="hidden lg:flex items-center h-10 bg-slate-900 border border-slate-800 rounded-xl px-4 text-slate-500 hover:border-slate-700 transition-colors cursor-pointer group w-64 mr-4">
-                            <Search className="w-4 h-4 mr-3 group-hover:text-blue-500 transition-colors" />
-                            <span className="text-sm font-medium">Search records...</span>
+                    <div className="admin-header-right">
+                        <div className="admin-search">
+                            <Search className="admin-search-icon" />
+                            <span className="admin-search-text">Search records...</span>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <button className="relative p-2.5 text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-800 rounded-xl transition-all border border-slate-800">
-                                <Bell className="w-5 h-5" />
-                                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                        <div className="admin-header-actions">
+                            <button className="admin-action-btn">
+                                <Bell className="admin-action-icon" />
+                                <span className="admin-action-badge" />
                             </button>
                         </div>
                     </div>
                 </header>
 
                 {/* Page View Area */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative">
-                    <div className="max-w-[1400px] mx-auto min-h-full">
+                <div className="admin-content-area custom-scrollbar">
+                    <div className="admin-content-wrapper">
                         <AnimatePresence>
                             <motion.div
                                 key={location.pathname}
@@ -180,7 +178,7 @@ const UserLayout = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -15 }}
                                 transition={{ duration: 0.3 }}
-                                className="h-full"
+                                style={{ height: '100%' }}
                             >
                                 <Outlet />
                             </motion.div>

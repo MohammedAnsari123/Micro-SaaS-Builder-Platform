@@ -4,6 +4,8 @@ import { Copy, LayoutTemplate, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+import '../styles/pages.css';
+
 const TemplateGallery = () => {
     const [templates, setTemplates] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,41 +50,54 @@ const TemplateGallery = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white pt-24 pb-12 px-6">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex items-center gap-4 mb-12">
-                    <LayoutTemplate className="w-10 h-10 text-blue-500" />
+        <div className="page-container" style={{ paddingTop: 'var(--spacing-20)' }}>
+            <div style={{ maxWidth: '80rem', margin: '0 auto', width: '100%' }}>
+                <div className="template-hero">
+                    <LayoutTemplate className="template-hero-icon" />
                     <div>
-                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 mb-2">
-                            SaaS Template Library
-                        </h1>
-                        <p className="text-slate-400">Select a pre-configured architecture blueprint to instantly generate your SaaS backend.</p>
+                        <h1 className="template-hero-title">SaaS Template Library</h1>
+                        <p className="template-hero-desc">Select a pre-configured architecture blueprint to instantly generate your SaaS backend.</p>
                     </div>
                 </div>
 
                 {isLoading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    <div className="data-empty">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: 'var(--color-secondary)' }}></div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="template-grid">
                         {templates.map((template, idx) => {
-                            // Map database colorTheme string to actual Tailwind functional classes
+                            // Map database colorTheme string to actual CSS gradients
                             const colorMap = {
-                                "blue": "from-blue-500/20 to-indigo-500/20 text-blue-400 border-blue-500/30",
-                                "indigo": "from-indigo-500/20 to-violet-500/20 text-indigo-400 border-indigo-500/30",
-                                "emerald": "from-emerald-500/20 to-teal-500/20 text-emerald-400 border-emerald-500/30",
-                                "rose": "from-rose-500/20 to-pink-500/20 text-rose-400 border-rose-500/30",
-                                "violet": "from-violet-500/20 to-purple-500/20 text-violet-400 border-violet-500/30",
-                                "teal": "from-teal-500/20 to-emerald-500/20 text-teal-400 border-teal-500/30",
-                                "fuchsia": "from-fuchsia-500/20 to-pink-500/20 text-fuchsia-400 border-fuchsia-500/30",
-                                "cyan": "from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/30",
-                                "orange": "from-orange-500/20 to-amber-500/20 text-orange-400 border-orange-500/30",
-                                "amber": "from-amber-500/20 to-yellow-500/20 text-amber-400 border-amber-500/30",
-                                "slate": "from-slate-500/20 to-gray-500/20 text-slate-400 border-slate-500/30"
+                                "blue": "linear-gradient(to bottom right, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2))",
+                                "indigo": "linear-gradient(to bottom right, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2))",
+                                "emerald": "linear-gradient(to bottom right, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.2))",
+                                "rose": "linear-gradient(to bottom right, rgba(244, 63, 94, 0.2), rgba(236, 72, 153, 0.2))",
+                                "violet": "linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2))",
+                                "teal": "linear-gradient(to bottom right, rgba(20, 184, 166, 0.2), rgba(16, 185, 129, 0.2))",
+                                "fuchsia": "linear-gradient(to bottom right, rgba(217, 70, 239, 0.2), rgba(236, 72, 153, 0.2))",
+                                "cyan": "linear-gradient(to bottom right, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2))",
+                                "orange": "linear-gradient(to bottom right, rgba(249, 115, 22, 0.2), rgba(245, 158, 11, 0.2))",
+                                "amber": "linear-gradient(to bottom right, rgba(245, 158, 11, 0.2), rgba(234, 179, 8, 0.2))",
+                                "slate": "linear-gradient(to bottom right, rgba(100, 116, 139, 0.2), rgba(107, 114, 128, 0.2))"
                             };
 
-                            const themeClass = colorMap[template.colorTheme] || colorMap["blue"];
+                            const iconColorMap = {
+                                "blue": "rgb(96, 165, 250)",
+                                "indigo": "rgb(129, 140, 248)",
+                                "emerald": "rgb(52, 211, 153)",
+                                "rose": "rgb(251, 113, 133)",
+                                "violet": "rgb(167, 139, 250)",
+                                "teal": "rgb(45, 212, 191)",
+                                "fuchsia": "rgb(232, 121, 249)",
+                                "cyan": "rgb(34, 211, 238)",
+                                "orange": "rgb(251, 146, 60)",
+                                "amber": "rgb(251, 191, 36)",
+                                "slate": "rgb(148, 163, 184)"
+                            };
+
+                            const themeBg = colorMap[template.colorTheme] || colorMap["blue"];
+                            const themeIconColor = iconColorMap[template.colorTheme] || iconColorMap["blue"];
 
                             return (
                                 <motion.div
@@ -90,39 +105,39 @@ const TemplateGallery = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.1 }}
-                                    className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/50 transition-all duration-300 group flex flex-col h-full"
+                                    className="template-card"
                                 >
                                     {/* Dynamic Graphic Header instead of iframe */}
-                                    <div className={`h-40 rounded-xl mb-6 relative overflow-hidden bg-gradient-to-br ${themeClass.split(' ')[0]} ${themeClass.split(' ')[1]} border ${themeClass.split(' ')[3]} group-hover:brightness-110 transition-all`}>
+                                    <div className="template-graphic" style={{ background: themeBg, borderColor: themeIconColor }}>
                                         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvc3ZnPg==')] [mask-image:linear-gradient(to_bottom,white,transparent)]" />
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <LayoutTemplate className={`w-16 h-16 ${themeClass.split(' ')[2]} opacity-80 group-hover:scale-110 transition-transform duration-500`} />
+                                            <LayoutTemplate className="template-graphic-icon" style={{ color: themeIconColor }} />
                                         </div>
-                                        <div className="absolute bottom-3 left-3 flex gap-2">
-                                            <span className={`px-2 py-1 rounded bg-black/40 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white/90`}>
+                                        <div className="template-graphic-badges">
+                                            <span className="template-badge">
                                                 {template.defaultTools?.length || 0} Collections
                                             </span>
-                                            <span className={`px-2 py-1 rounded bg-black/40 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white/90`}>
+                                            <span className="template-badge">
                                                 {template.pages?.length || 0} Pages
                                             </span>
                                         </div>
                                     </div>
 
-                                    <h3 className="text-2xl font-bold mb-2 text-white">{template.name}</h3>
-                                    <p className="text-slate-400 mb-6 flex-grow text-sm leading-relaxed">{template.description}</p>
+                                    <h3 className="template-name">{template.name}</h3>
+                                    <p className="template-desc">{template.description}</p>
 
-                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
+                                    <div className="template-actions">
                                         <button
                                             onClick={() => navigate(`/templatePreview/${template.slug}`)}
-                                            className="w-1/2 flex items-center justify-center gap-2 bg-slate-700/50 hover:bg-slate-600 text-slate-200 py-3 rounded-xl transition-colors font-medium border border-slate-600"
+                                            className="btn-template btn-template-preview"
                                         >
-                                            <Monitor className="w-4 h-4" /> Preview
+                                            <Monitor style={{ width: '16px', height: '16px' }} /> Preview
                                         </button>
                                         <button
                                             onClick={() => handleClone(template._id)}
-                                            className="w-1/2 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl transition-colors font-medium shadow-lg shadow-blue-500/25"
+                                            className="btn-template btn-template-use"
                                         >
-                                            <Copy className="w-4 h-4" /> Use
+                                            <Copy style={{ width: '16px', height: '16px' }} /> Use
                                         </button>
                                     </div>
                                 </motion.div>

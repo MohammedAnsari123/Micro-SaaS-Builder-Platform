@@ -1,0 +1,153 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: var(--spacing-4) var(--spacing-6);
+  background: var(--color-bg-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  transition: transform var(--transition-fast);
+}
+
+.navbar-logo:hover {
+  transform: scale(1.02);
+}
+
+.navbar-logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px var(--color-primary-glow);
+  transition: box-shadow var(--transition-fast);
+}
+
+.navbar-logo:hover .navbar-logo-icon {
+  box-shadow: 0 4px 25px var(--color-secondary-glow);
+}
+
+.navbar-logo-text {
+  font-weight: 800;
+  font-size: 1.25rem;
+  background: linear-gradient(to right, var(--color-text-main), var(--color-text-muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.05em;
+}
+
+.navbar-links {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}
+
+.navbar-link {
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast), text-shadow var(--transition-fast);
+}
+
+.navbar-link:hover {
+  color: var(--color-text-main);
+  text-shadow: none;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.btn-primary {
+  position: relative;
+  padding: var(--spacing-2) var(--spacing-6);
+  border-radius: var(--border-radius-pill);
+  background-color: var(--color-text-main);
+  color: var(--color-bg-base);
+  font-weight: 700;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  overflow: hidden;
+  transition: transform var(--transition-fast);
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(14, 165, 233, 0.1));
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.navbar-logout {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.navbar-logout:hover {
+  color: var(--color-primary);
+}
+
+.icon-transition {
+  transition: transform var(--transition-fast);
+}
+
+.btn-primary:hover .icon-transition {
+  transform: translateX(4px);
+}

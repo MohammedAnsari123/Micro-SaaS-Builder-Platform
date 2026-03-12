@@ -1,0 +1,47 @@
+:root {
+  /* Colors - Clean Modern Light Theme */
+  --color-bg-base: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-hover: #f1f5f9;
+  --color-bg-elevated: #ffffff;
+  
+  --color-primary: #3b82f6; /* Modern energetic blue */
+  --color-primary-glow: rgba(59, 130, 246, 0.15);
+  --color-secondary: #0ea5e9;
+  --color-secondary-glow: rgba(14, 165, 233, 0.15);
+  --color-accent: #6366f1;
+  
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+  
+  --color-border: #e2e8f0;
+  --color-border-focus: #cbd5e1;
+
+  /* Typography */
+  --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Utilities */
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+  --border-radius-pill: 9999px;
+
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-32: 8rem;
+}

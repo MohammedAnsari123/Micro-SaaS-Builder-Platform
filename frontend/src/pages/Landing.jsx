@@ -8,7 +8,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 
-import Scene from '../components/3d/Scene';
+import '../styles/landing.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,7 +39,7 @@ const WordReveal = ({ children, className = '', delay = 0 }) => {
     return (
         <span ref={ref} className={className}>
             {text.split(' ').map((word, i) => (
-                <span key={i} className="wr-word inline-block mr-[0.3em]">{word}</span>
+                <span key={i} className="wr-word" style={{ display: 'inline-block', marginRight: '0.3em' }}>{word}</span>
             ))}
         </span>
     );
@@ -47,21 +47,21 @@ const WordReveal = ({ children, className = '', delay = 0 }) => {
 
 /* ── Icon Micro-Animations ── */
 const PulseIcon = ({ icon: Icon, color, className = '' }) => (
-    <div className={`relative ${className}`}>
-        <div className="absolute inset-0 rounded-2xl animate-ping opacity-20" style={{ backgroundColor: color }} />
-        <Icon className="w-7 h-7 relative z-10" style={{ color }} />
+    <div className={`relative ${className}`} style={{ position: 'relative' }}>
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '16px', animation: 'auroraPulse 2s infinite', opacity: 0.2, backgroundColor: color }} />
+        <Icon style={{ width: '28px', height: '28px', position: 'relative', zIndex: 10, color }} />
     </div>
 );
 
 const FloatIcon = ({ icon: Icon, color, className = '' }) => (
     <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} className={className}>
-        <Icon className="w-7 h-7" style={{ color }} />
+        <Icon style={{ width: '28px', height: '28px', color }} />
     </motion.div>
 );
 
 const SpinIcon = ({ icon: Icon, color, className = '' }) => (
     <motion.div animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: 'linear' }} className={className}>
-        <Icon className="w-7 h-7" style={{ color }} />
+        <Icon style={{ width: '28px', height: '28px', color }} />
     </motion.div>
 );
 
@@ -97,30 +97,27 @@ const FeatureCard = ({ icon: Icon, title, desc, color, index }) => {
     }, [index]);
 
     return (
-        <div
-            ref={ref}
-            className="bg-[#16213E] border border-white/5 rounded-2xl p-7 sm:p-8 group cursor-default relative overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(67,97,238,0.08)]"
-        >
-            <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-700" style={{ backgroundColor: color }} />
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 border border-white/10 group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: `${color}15` }}>
+        <div ref={ref} className="feature-card group" style={{ opacity: 0 }}>
+            <div className="feature-glow" style={{ backgroundColor: color }} />
+            <div className="feature-icon-wrapper" style={{ backgroundColor: `${color}15`, borderColor: `${color}30` }}>
                 <AnimIcon icon={Icon} color={color} />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            <h3 className="feature-title">{title}</h3>
+            <p className="feature-desc">{desc}</p>
         </div>
     );
 };
 
 const FeaturesSection = () => (
-    <section id="features" className="py-20 sm:py-28 md:py-36 px-6 bg-[#1A1A2E]">
-        <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-14 sm:mb-20">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
+    <section id="features" className="landing-section">
+        <div className="landing-container">
+            <div className="section-header">
+                <h2 className="section-title">
                     <WordReveal>Everything You Need to Ship</WordReveal>
                 </h2>
-                <p className="text-slate-400 text-base sm:text-lg max-w-lg mx-auto">Each tool you saw attach in the animation is a real capability.</p>
+                <p className="section-subtitle">Each tool you saw attach in the animation is a real capability.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="features-grid">
                 {FEATURES.map((f, i) => <FeatureCard key={f.title} {...f} index={i} />)}
             </div>
         </div>
@@ -175,38 +172,36 @@ const HowItWorksSection = () => {
     }, []);
 
     return (
-        <section id="how-it-works" ref={sectionRef} className="py-20 sm:py-28 md:py-36 px-6 bg-[#1A1A2E]">
-            <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-14 sm:mb-20">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
+        <section id="how-it-works" ref={sectionRef} className="landing-section">
+            <div className="landing-container" style={{ maxWidth: '800px' }}>
+                <div className="section-header">
+                    <h2 className="section-title">
                         <WordReveal>How It Works</WordReveal>
                     </h2>
-                    <p className="text-slate-400 text-base sm:text-lg">Three steps. Zero boilerplate.</p>
+                    <p className="section-subtitle">Three steps. Zero boilerplate.</p>
                 </div>
 
-                <div className="relative">
+                <div className="timeline-line-container">
                     {/* Self-drawing line */}
-                    <div className="absolute left-6 md:left-8 top-0 bottom-0 w-px bg-white/5">
-                        <div ref={lineRef} className="w-full h-full bg-gradient-to-b from-[#4361EE] to-[#4CC9F0] origin-top" style={{ transform: 'scaleY(0)' }} />
+                    <div className="timeline-line">
+                        <div ref={lineRef} className="timeline-progress" style={{ transform: 'scaleY(0)' }} />
                     </div>
 
-                    <div className="space-y-16 md:space-y-20">
+                    <div>
                         {STEPS.map((s, i) => (
-                            <div key={s.step} className="flex gap-6 md:gap-8 items-start">
+                            <div key={s.step} className="timeline-step">
                                 {/* Node */}
                                 <div
                                     ref={el => nodeRefs.current[i] = el}
-                                    className="shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#4361EE]/10 border-2 border-[#4361EE]/40 flex items-center justify-center z-10 relative"
+                                    className="timeline-node"
                                     style={{ opacity: 0 }}
                                 >
-                                    <span className="text-[#4361EE] font-black text-lg md:text-xl">{s.step}</span>
-                                    {/* Glow ring */}
-                                    <div className="absolute inset-0 rounded-full border-2 border-[#4361EE]/20 animate-ping" />
+                                    <span>{s.step}</span>
                                 </div>
                                 {/* Text */}
                                 <div ref={el => textRefs.current[i] = el} style={{ opacity: 0 }}>
-                                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{s.title}</h3>
-                                    <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-md">{s.desc}</p>
+                                    <h3 className="timeline-content-title">{s.title}</h3>
+                                    <p className="timeline-content-desc">{s.desc}</p>
                                 </div>
                             </div>
                         ))}
@@ -255,28 +250,28 @@ const PricingCard = ({ name, price, description, features, recommended, yearly, 
     return (
         <div
             ref={ref}
-            className={`bg-[#16213E] border ${recommended ? 'border-[#4361EE] shadow-[0_0_50px_rgba(67,97,238,0.12)]' : 'border-white/5'} rounded-3xl p-8 sm:p-10 flex flex-col relative overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:border-[#4361EE]/40 hover:shadow-[0_0_30px_rgba(67,97,238,0.08)] cursor-default ${recommended ? 'md:scale-105 z-10' : ''}`}
-            style={{ perspective: '1200px', opacity: 0 }}
+            className={`pricing-card ${recommended ? 'recommended' : ''}`}
+            style={{ opacity: 0 }}
         >
             {recommended && (
-                <div className="absolute top-5 right-5 px-3 py-1 bg-[#4361EE] text-white text-[10px] font-black rounded-full tracking-widest uppercase animate-pulse">Popular</div>
+                <div className="pricing-badge">Popular</div>
             )}
-            <h3 className="text-2xl font-bold text-white mb-1">{name}</h3>
-            <p className="text-slate-500 text-sm mb-6">{description}</p>
-            <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-4xl sm:text-5xl font-black text-white tracking-tighter">
+            <h3 className="pricing-name">{name}</h3>
+            <p className="pricing-desc">{description}</p>
+            <div className="pricing-price-wrap">
+                <span className="pricing-price">
                     <NumberRoll value={displayPrice} />
                 </span>
-                <span className="text-slate-500 text-sm font-medium">/{yearly ? 'yr' : 'mo'}</span>
+                <span className="pricing-period">/{yearly ? 'yr' : 'mo'}</span>
             </div>
-            <div className="space-y-3 mb-8 flex-1">
+            <div className="pricing-features">
                 {features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-3 text-slate-300 text-sm">
-                        <Check className="w-4 h-4 text-[#4361EE] shrink-0" />{f}
+                    <div key={i} className="pricing-feature">
+                        <Check className="w-4 h-4 pricing-check shrink-0" />{f}
                     </div>
                 ))}
             </div>
-            <Link to="/register" className={`w-full py-4 rounded-xl font-bold text-sm text-center transition-all active:scale-95 block ${recommended ? 'bg-[#4361EE] hover:bg-[#3651DE] text-white shadow-lg shadow-[#4361EE]/20' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'}`}>
+            <Link to="/register" className={`pricing-btn ${recommended ? 'primary' : 'outline'}`}>
                 Get Started
             </Link>
         </div>
@@ -286,23 +281,23 @@ const PricingCard = ({ name, price, description, features, recommended, yearly, 
 const PricingSection = () => {
     const [yearly, setYearly] = useState(false);
     return (
-        <section id="pricing" className="py-20 sm:py-28 md:py-36 px-6 bg-[#16213E]/50">
-            <div className="max-w-5xl mx-auto">
-                <div className="text-center mb-14 sm:mb-20">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-6">
+        <section id="pricing" className="landing-section">
+            <div className="landing-container" style={{ maxWidth: '1000px' }}>
+                <div className="section-header">
+                    <h2 className="section-title">
                         <WordReveal>Simple Transparent Pricing</WordReveal>
                     </h2>
-                    <div className="flex items-center justify-center gap-4">
-                        <span className={`text-sm font-bold transition-colors ${!yearly ? 'text-white' : 'text-slate-600'}`}>Monthly</span>
-                        <button onClick={() => setYearly(!yearly)} className="w-14 h-8 bg-[#1A1A2E] border border-slate-700 rounded-full p-1 relative hover:border-[#4361EE]/50 transition-colors">
-                            <motion.div animate={{ x: yearly ? 24 : 0 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} className="w-6 h-6 bg-[#4361EE] rounded-full shadow-lg" />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 700, transition: 'color 0.2s', color: !yearly ? 'var(--color-text-main)' : 'var(--color-text-muted)' }}>Monthly</span>
+                        <button onClick={() => setYearly(!yearly)} style={{ width: '56px', height: '32px', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', borderRadius: '9999px', padding: '4px', position: 'relative', transition: 'border-color 0.2s' }}>
+                            <motion.div animate={{ x: yearly ? 24 : 0 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} style={{ width: '22px', height: '22px', backgroundColor: 'var(--color-primary)', borderRadius: '50%', boxShadow: '0 4px 10px rgba(255, 32, 121, 0.4)' }} />
                         </button>
-                        <span className={`text-sm font-bold transition-colors ${yearly ? 'text-white' : 'text-slate-600'}`}>
-                            Yearly <span className="text-emerald-400 text-[10px] ml-1 bg-emerald-400/10 px-1.5 py-0.5 rounded">-20%</span>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 700, transition: 'color 0.2s', color: yearly ? 'var(--color-text-main)' : 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            Yearly <span style={{ color: 'var(--color-secondary)', fontSize: '10px', backgroundColor: 'rgba(0, 212, 255, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>-20%</span>
                         </span>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8" style={{ perspective: '1200px' }}>
+                <div className="pricing-grid">
                     <PricingCard name="Free" price={0} description="Test your first idea." features={['3 SaaS Projects', '50MB Storage', 'Community Support', 'Standard Deploy']} yearly={yearly} index={0} />
                     <PricingCard name="Pro" price={49} description="Scale your product." features={['Unlimited Projects', '5GB Storage', 'White-label', 'Priority Support', 'Analytics']} recommended yearly={yearly} index={1} />
                     <PricingCard name="Team" price={149} description="Build multiple products." features={['Everything in Pro', '50GB Storage', 'Team Collab', '24/7 Support', 'Custom Domains']} yearly={yearly} index={2} />
@@ -360,30 +355,30 @@ const TestimonialsSection = () => {
     }, []);
 
     return (
-        <section ref={sectionRef} className="py-20 sm:py-28 md:py-36 px-6 bg-[#1A1A2E]">
-            <div className="max-w-5xl mx-auto">
-                <div className="text-center mb-14 sm:mb-20">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
+        <section ref={sectionRef} className="landing-section">
+            <div className="landing-container">
+                <div className="section-header">
+                    <h2 className="section-title">
                         <WordReveal>Loved by Builders</WordReveal>
                     </h2>
                 </div>
 
                 {/* Desktop: all 3 visible with alternating slide */}
-                <div className="hidden md:grid grid-cols-3 gap-6">
+                <div className="features-grid hidden md:grid" style={{ display: 'none' }}>
                     {TESTIMONIALS.map((t, i) => (
-                        <div key={i} ref={el => cardRefs.current[i] = el} className="bg-[#16213E] border border-white/5 rounded-2xl p-8 relative" style={{ opacity: 0 }}>
-                            <div className="flex gap-1 mb-4">
-                                {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />)}
+                        <div key={i} ref={el => cardRefs.current[i] = el} className="testimonial-card" style={{ opacity: 0 }}>
+                            <div className="testi-stars">
+                                {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-amber-400" />)}
                             </div>
-                            <p className="text-slate-300 text-sm leading-relaxed mb-6 italic">"{t.quote}"</p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4361EE] to-[#4CC9F0] flex items-center justify-center text-white font-bold text-sm relative">
+                            <p className="testi-quote">"{t.quote}"</p>
+                            <div className="testi-author">
+                                <div className="testi-avatar shrink-0 relative">
                                     {t.name[0]}
-                                    <div className="absolute inset-0 rounded-full border-2 border-[#4361EE]/30 animate-ping" />
+                                    <div className="absolute inset-0 rounded-full border-2 border-[var(--color-primary)] animate-ping opacity-30" />
                                 </div>
                                 <div>
-                                    <div className="font-bold text-white text-sm">{t.name}</div>
-                                    <div className="text-slate-500 text-xs">{t.role}</div>
+                                    <div className="testi-name">{t.name}</div>
+                                    <div className="testi-role">{t.role}</div>
                                 </div>
                             </div>
                         </div>
@@ -398,35 +393,35 @@ const TestimonialsSection = () => {
                             initial={{ opacity: 0, x: 40 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -40 }}
-                            transition={{ duration: 0.4, ease: EASE }}
-                            className="bg-[#16213E] border border-white/5 rounded-2xl p-8"
+                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            className="testimonial-card"
                         >
-                            <div className="flex gap-1 mb-4">
-                                {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />)}
+                            <div className="testi-stars">
+                                {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-amber-400" />)}
                             </div>
-                            <p className="text-slate-300 text-sm leading-relaxed mb-6 italic">"{TESTIMONIALS[active].quote}"</p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4361EE] to-[#4CC9F0] flex items-center justify-center text-white font-bold text-sm">
+                            <p className="testi-quote">"{TESTIMONIALS[active].quote}"</p>
+                            <div className="testi-author">
+                                <div className="testi-avatar shrink-0">
                                     {TESTIMONIALS[active].name[0]}
                                 </div>
                                 <div>
-                                    <div className="font-bold text-white text-sm">{TESTIMONIALS[active].name}</div>
-                                    <div className="text-slate-500 text-xs">{TESTIMONIALS[active].role}</div>
+                                    <div className="testi-name">{TESTIMONIALS[active].name}</div>
+                                    <div className="testi-role">{TESTIMONIALS[active].role}</div>
                                 </div>
                             </div>
                         </motion.div>
                     </AnimatePresence>
-                    <div className="flex items-center justify-center gap-4 mt-6">
-                        <button onClick={prev} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
-                            <ChevronLeft className="w-5 h-5 text-white" />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+                        <button onClick={prev} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer' }}>
+                            <ChevronLeft style={{ width: '20px', height: '20px' }} />
                         </button>
-                        <div className="flex gap-2">
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
                             {TESTIMONIALS.map((_, i) => (
-                                <button key={i} onClick={() => goTo(i)} className={`w-2 h-2 rounded-full transition-all ${i === active ? 'bg-[#4361EE] w-6' : 'bg-white/20'}`} />
+                                <button key={i} onClick={() => goTo(i)} style={{ width: i === active ? '24px' : '8px', height: '8px', borderRadius: '4px', background: i === active ? 'var(--color-primary)' : 'rgba(255,255,255,0.2)', transition: 'all 0.3s', border: 'none', cursor: 'pointer' }} />
                             ))}
                         </div>
-                        <button onClick={next} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
-                            <ChevronRight className="w-5 h-5 text-white" />
+                        <button onClick={next} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer' }}>
+                            <ChevronRight style={{ width: '20px', height: '20px' }} />
                         </button>
                     </div>
                 </div>
@@ -449,7 +444,6 @@ const FAQS = [
 const FAQItem = ({ q, a, index }) => {
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
-    const contentRef = useRef(null);
 
     useEffect(() => {
         if (!ref.current) return;
@@ -464,41 +458,27 @@ const FAQItem = ({ q, a, index }) => {
         return () => { anim.scrollTrigger?.kill(); anim.kill(); };
     }, [index]);
 
-    // Smooth max-height animation
-    useEffect(() => {
-        if (!contentRef.current) return;
-        if (open) {
-            contentRef.current.style.maxHeight = contentRef.current.scrollHeight + 'px';
-            contentRef.current.style.opacity = '1';
-        } else {
-            contentRef.current.style.maxHeight = '0px';
-            contentRef.current.style.opacity = '0';
-        }
-    }, [open]);
-
     return (
-        <div ref={ref} className="border-b border-white/5" style={{ opacity: 0 }}>
-            <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
-                <span className="flex items-center gap-3">
-                    <span className={`w-1 h-6 rounded-full transition-all duration-300 ${open ? 'bg-[#4361EE]' : 'bg-transparent'}`} />
-                    <span className="text-white font-medium text-sm sm:text-base pr-4">{q}</span>
+        <div ref={ref} className="faq-item" style={{ opacity: 0 }}>
+            <button onClick={() => setOpen(!open)} className="faq-btn group">
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span style={{ width: '4px', height: '24px', borderRadius: '9999px', transition: 'all 0.3s', backgroundColor: open ? 'var(--color-primary)' : 'transparent' }} />
+                    <span className="faq-q">{q}</span>
                 </span>
-                <motion.span animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.2 }}>
-                    <Plus className={`w-5 h-5 shrink-0 transition-colors ${open ? 'text-[#4361EE]' : 'text-slate-500 group-hover:text-[#4361EE]'}`} />
-                </motion.span>
+                <Plus className={`faq-icon ${open ? 'open' : ''}`} style={{ width: '20px', height: '20px' }} />
             </button>
-            <div ref={contentRef} className="overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]" style={{ maxHeight: 0, opacity: 0 }}>
-                <p className="text-slate-400 text-sm leading-relaxed pb-5 pl-4 border-l-2 border-[#4361EE]/20 ml-3">{a}</p>
+            <div className="faq-a-wrapper" style={{ maxHeight: open ? '200px' : '0px', opacity: open ? 1 : 0 }}>
+                <p className="faq-a">{a}</p>
             </div>
         </div>
     );
 };
 
 const FAQSection = () => (
-    <section className="py-20 sm:py-28 md:py-36 px-6 bg-[#16213E]/50">
-        <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-14">
-                <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">
+    <section className="landing-section">
+        <div className="landing-container" style={{ maxWidth: '800px' }}>
+            <div className="section-header">
+                <h2 className="section-title">
                     <WordReveal>Frequently Asked Questions</WordReveal>
                 </h2>
             </div>
@@ -511,20 +491,22 @@ const FAQSection = () => (
    SECTION 7 — FINAL CTA (Animated Gradient + Word Reveal + Glow Pulse)
    ═══════════════════════════════════════════════════════ */
 const FinalCTA = () => (
-    <section className="relative py-20 sm:py-28 md:py-36 px-6 overflow-hidden">
+    <section className="cta-section">
         {/* Animated gradient background */}
-        <div className="absolute inset-0" style={{
-            background: 'linear-gradient(135deg, #1A1A2E, #0F3460, #4361EE, #0F3460, #1A1A2E)',
+        <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(135deg, var(--color-bg-base), var(--color-bg-surface), var(--color-primary), var(--color-bg-surface), var(--color-bg-base))',
             backgroundSize: '400% 400%',
-            animation: 'gradientShift 12s ease infinite'
+            animation: 'gradientShift 12s ease infinite',
+            opacity: 0.15
         }} />
         {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
             {[...Array(15)].map((_, i) => (
                 <div
                     key={i}
-                    className="absolute w-1 h-1 bg-white/20 rounded-full"
                     style={{
+                        position: 'absolute', width: '4px', height: '4px', background: 'rgba(255,255,255,0.2)', borderRadius: '50%',
                         left: `${Math.random() * 100}%`,
                         top: `${Math.random() * 100}%`,
                         animation: `floatParticle ${5 + Math.random() * 8}s ease-in-out infinite`,
@@ -534,10 +516,10 @@ const FinalCTA = () => (
             ))}
         </div>
 
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tight mb-6 leading-tight">
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: '800px', margin: '0 auto' }}>
+            <h2 className="cta-title">
                 <WordReveal delay={0}>Ready to Build</WordReveal><br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4CC9F0] to-white">
+                <span className="cta-title-highlight">
                     <WordReveal delay={0.3}>Your Next SaaS?</WordReveal>
                 </span>
             </h2>
@@ -546,7 +528,7 @@ const FinalCTA = () => (
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
                 viewport={{ once: true }}
-                className="text-white/70 text-base sm:text-lg mb-10 max-w-lg mx-auto"
+                className="cta-desc"
             >
                 Join thousands of developers shipping faster with Micro SaaS Builder.
             </motion.p>
@@ -556,13 +538,12 @@ const FinalCTA = () => (
                 transition={{ duration: 0.6, delay: 0.7 }}
                 viewport={{ once: true }}
             >
-                <Link
-                    to="/register"
-                    className="inline-flex items-center gap-3 px-8 sm:px-12 py-4 sm:py-5 bg-white text-[#1A1A2E] font-black rounded-2xl transition-all active:scale-95 text-sm sm:text-base uppercase tracking-widest relative overflow-hidden group"
-                >
+                <Link to="/register" className="cta-btn group relative">
                     {/* Continuous glow pulse */}
-                    <span className="absolute inset-0 rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.3)] animate-pulse" />
-                    <span className="relative z-10 flex items-center gap-3">Start Building Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></span>
+                    <span style={{ position: 'absolute', inset: 0, borderRadius: 'var(--border-radius-lg)', boxShadow: '0 0 40px rgba(255,255,255,0.3)', animation: 'auroraPulse 2s infinite', opacity: 0.5 }} />
+                    <span style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        Start Building Free <ArrowRight style={{ width: '20px', height: '20px' }} className="group-hover:translate-x-1 transition-transform" />
+                    </span>
                 </Link>
             </motion.div>
         </div>
@@ -596,63 +577,63 @@ const Counter = ({ value, suffix = '', label }) => {
     }, [value]);
 
     return (
-        <div ref={ref} className="text-center">
-            <div className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter">{count}{suffix}</div>
-            <div className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-2">{label}</div>
+        <div ref={ref} style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '-0.05em', color: 'var(--color-text-main)' }}>{count}{suffix}</div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.5rem', color: 'var(--color-text-muted)' }}>{label}</div>
         </div>
     );
 };
 
 /* ═══════════════════════════════════════════════════════
-   MOBILE 2D FALLBACK HERO
+   HERO SECTION
    ═══════════════════════════════════════════════════════ */
-const MobileHeroFallback = () => (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 bg-[#1A1A2E] overflow-hidden">
-        {/* Animated gradient orb */}
-        <div className="absolute w-80 h-80 bg-[#4361EE]/20 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute top-20 right-10 w-40 h-40 bg-[#4CC9F0]/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
-
-        {/* Auto-playing tool animation */}
-        <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: EASE }}
-            className="relative w-64 h-80 bg-[#0F3460] border border-white/10 rounded-3xl mb-10 overflow-hidden shadow-2xl"
-        >
-            {/* Panel content auto-builds */}
-            {FEATURES.slice(0, 5).map((f, i) => (
-                <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -(i % 2 === 0 ? 40 : -40) }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 + i * 0.5, duration: 0.6, ease: EASE }}
-                    className="flex items-center gap-3 px-4 py-3 border-b border-white/5"
-                >
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${f.color}20` }}>
-                        <f.icon className="w-4 h-4" style={{ color: f.color }} />
-                    </div>
-                    <span className="text-white text-xs font-medium">{f.title}</span>
-                </motion.div>
-            ))}
-            {/* Glow effect  */}
+const HeroSection = () => (
+    <section className="landing-section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', paddingTop: '100px' }}>
+        <div style={{ position: 'absolute', width: '600px', height: '600px', background: 'var(--color-primary)', borderRadius: '50%', opacity: 0.05, filter: 'blur(100px)', top: '-20%', left: '-10%', animation: 'auroraPulse 8s infinite alternate' }} />
+        <div style={{ position: 'absolute', width: '500px', height: '500px', background: 'var(--color-secondary)', borderRadius: '50%', opacity: 0.05, filter: 'blur(100px)', bottom: '-20%', right: '-10%', animation: 'auroraPulse 6s infinite alternate-reverse' }} />
+        
+        <div className="landing-container" style={{ textAlign: 'center', zIndex: 10, position: 'relative' }}>
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 4, duration: 1 }}
-                className="absolute inset-0 bg-gradient-to-t from-[#4361EE]/10 to-transparent pointer-events-none rounded-3xl"
-            />
-        </motion.div>
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', background: 'var(--color-bg-elevated)', borderRadius: '9999px', border: '1px solid var(--color-border)', marginBottom: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                    <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-primary)', animation: 'pulse 2s infinite' }} />
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-main)' }}>Micro SaaS Builder Platform</span>
+                </div>
+            </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="text-center relative z-10">
-            <h1 className="text-4xl font-black text-white tracking-tight mb-4 leading-[1.1]">
-                Build Your Micro SaaS<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4361EE] to-[#4CC9F0]">in Minutes</span>
+            <h1 style={{ fontSize: 'clamp(3rem, 8vw, 5.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-0.02em', color: 'var(--color-text-main)' }}>
+                <WordReveal delay={0.2}>Build Your Micro SaaS</WordReveal><br />
+                <span className="cta-title-highlight">
+                    <WordReveal delay={0.6}>in Minutes</WordReveal>
+                </span>
             </h1>
-            <p className="text-slate-400 text-base mb-8 max-w-xs mx-auto">From idea to deployed product — in one workflow</p>
-            <Link to="/register" className="inline-flex items-center gap-2 px-8 py-4 bg-[#4361EE] text-white font-black rounded-2xl text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(67,97,238,0.3)]">
-                Start Building Free <ArrowRight className="w-5 h-5" />
-            </Link>
-        </motion.div>
+            
+            <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                style={{ fontSize: 'clamp(1.125rem, 2vw, 1.375rem)', color: 'var(--color-text-muted)', maxWidth: '600px', margin: '0 auto 3rem', lineHeight: 1.6 }}
+            >
+                From idea to deployed product — in one seamless workflow. Skip the boilerplate and focus on your unique value.
+            </motion.p>
+            
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 1 }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}
+            >
+                <Link to="/register" className="cta-btn primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 32px', fontSize: '1.125rem' }}>
+                    Start Building Free <ArrowRight style={{ width: '20px', height: '20px' }} />
+                </Link>
+                <a href="#features" className="cta-btn outline" style={{ padding: '16px 32px', fontSize: '1.125rem', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', borderRadius: 'var(--border-radius-xl)', fontWeight: 700, textDecoration: 'none' }}>
+                    Explore Features
+                </a>
+            </motion.div>
+        </div>
     </section>
 );
 
@@ -670,7 +651,7 @@ const Landing = () => {
     }, []);
 
     return (
-        <div className="bg-[#1A1A2E] text-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="landing-page">
             {/* CSS Keyframes */}
             <style>{`
                 @keyframes gradientShift {
@@ -683,22 +664,19 @@ const Landing = () => {
                     50% { transform: translateY(-30px) translateX(15px); opacity: 0.6; }
                 }
             `}</style>
+            
+            {/* Aurora Background Effects (Global) */}
+            <div className="aurora-bg">
+                <div className="aurora-orb aurora-orb-1" />
+                <div className="aurora-orb aurora-orb-2" />
+                <div className="aurora-orb aurora-orb-3" />
+            </div>
 
-            {/* Section 1 — Hero (3D or Mobile Fallback) */}
-            {isMobile ? <MobileHeroFallback /> : <Scene />}
+            {/* Section 1 — Hero */}
+            <HeroSection />
 
             {/* Section 2 — Features */}
             <FeaturesSection />
-
-            {/* Stats Bar */}
-            {/* <section className="py-14 sm:py-20 px-6 bg-[#0F3460]/30 border-y border-white/5">
-                <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <Counter value={10000} suffix="+" label="Apps Generated" />
-                    <Counter value={99} suffix="%" label="Uptime SLA" />
-                    <Counter value={50} suffix="ms" label="Avg Response" />
-                    <Counter value={150} suffix="+" label="Countries" />
-                </div>
-            </section> */}
 
             {/* Section 3 — How It Works */}
             <HowItWorksSection />
@@ -716,19 +694,19 @@ const Landing = () => {
             <FinalCTA />
 
             {/* Footer */}
-            <footer className="py-12 sm:py-16 px-6 bg-[#0F172A] border-t border-white/5">
-                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#4361EE] flex items-center justify-center font-black text-white shadow-lg shadow-[#4361EE]/20">C</div>
-                        <span className="font-bold text-white text-sm tracking-widest uppercase">CodeAra</span>
+            <footer className="footer relative z-10">
+                <div className="footer-container">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'white', boxShadow: '0 4px 20px rgba(255, 32, 121, 0.4)' }}>C</div>
+                        <span style={{ fontWeight: 700, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>CodeAra</span>
                     </div>
-                    <div className="flex gap-6 sm:gap-8 text-slate-500 text-xs font-bold uppercase tracking-widest">
-                        <a href="#features" className="hover:text-[#4361EE] transition-colors">Features</a>
-                        <a href="#pricing" className="hover:text-[#4361EE] transition-colors">Pricing</a>
-                        <a href="#" className="hover:text-[#4361EE] transition-colors">Twitter</a>
-                        <a href="#" className="hover:text-[#4361EE] transition-colors">GitHub</a>
+                    <div className="footer-links">
+                        <a href="#features" className="footer-link">Features</a>
+                        <a href="#pricing" className="footer-link">Pricing</a>
+                        <a href="#" className="footer-link">Twitter</a>
+                        <a href="#" className="footer-link">GitHub</a>
                     </div>
-                    <div className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">© 2026 CodeAra. All rights reserved.</div>
+                    <div className="footer-copyright">© 2026 CodeAra. All rights reserved.</div>
                 </div>
             </footer>
         </div>

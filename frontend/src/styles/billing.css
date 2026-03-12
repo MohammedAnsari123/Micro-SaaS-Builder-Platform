@@ -1,0 +1,210 @@
+/* Billing & Subscriptions Styles */
+.billing-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-3xl);
+  padding: var(--spacing-10);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .billing-hero {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.billing-glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 250px;
+  background-color: rgba(0, 212, 255, 0.05);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.billing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 4px 12px;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: rgb(245, 158, 11);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--spacing-4);
+}
+
+.billing-current {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-2xl);
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .billing-current {
+    width: 320px;
+  }
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-8);
+}
+
+@media (min-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pricing-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-3xl);
+  padding: var(--spacing-8);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+}
+
+.pricing-card.recommended {
+  border-color: var(--color-primary);
+  background-color: rgba(0, 212, 255, 0.02);
+}
+
+.pricing-best-value {
+  position: absolute;
+  top: 16px;
+  right: -30px;
+  background-color: var(--color-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 40px;
+  transform: rotate(45deg);
+  box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
+}
+
+.pricing-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  margin-bottom: var(--spacing-2);
+}
+
+.pricing-price-container {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: var(--spacing-6);
+}
+
+.pricing-amount {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+
+.pricing-period {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: var(--spacing-8);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.pricing-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pricing-icon {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(34, 197, 94, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: rgb(34, 197, 94);
+}
+
+.btn-pricing {
+  width: 100%;
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-xl);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-pricing.current {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  cursor: not-allowed;
+}
+
+.btn-pricing.upgrade {
+  background-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+}
+
+.btn-pricing.upgrade:hover {
+  background-color: var(--color-secondary);
+}
+
+.billing-secure {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-3xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}

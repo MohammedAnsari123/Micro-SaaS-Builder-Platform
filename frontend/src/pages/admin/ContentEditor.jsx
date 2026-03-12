@@ -1,16 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Save, Plus, Trash2, ChevronDown, ChevronRight, Edit2 } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5000/api/v1';
 
+/* ─── Dynamic Form Components ─── */
+const DynamicField = ({ label, value, path, onChange }) => {
+    const isColor = typeof value === 'string' && (value.startsWith('#') || value.startsWith('rgb'));
+    const isLongText = typeof value === 'string' && value.length > 50;
+
+    const handleChange = (e) => {
+        let newValue = e.target.value;
+        if (typeof value === 'number') newValue = Number(newValue);
+        if (typeof value === 'boolean') newValue = e.target.checked;
+        onChange(path, newValue);
+    };
+
+    if (typeof value === 'boolean') {
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <input type="checkbox" checked={value} onChange={handleChange} style={{ width: '16px', height: '16px', accentColor: '#3b82f6', cursor: 'pointer' }} />
+                <label style={{ fontSize: '13px', fontWeight: 500, color: '#334155', cursor: 'pointer' }}>{label}</label>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ marginBottom: '12px' }}>
+            {label && <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label.replace(/([A-Z])/g, ' $1').trim()}</label>}
+            {isLongText ? (
+                <textarea 
+                    value={value} 
+                    onChange={handleChange} 
+                    style={{ width: '100%', minHeight: '100px', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px', fontFamily: 'inherit', resize: 'vertical', outline: 'none', transition: 'border-color 0.2s', backgroundColor: '#f8fafc' }} 
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                />
+            ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {isColor && <input type="color" value={value} onChange={handleChange} style={{ width: '36px', height: '36px', padding: '0', border: 'none', borderRadius: '6px', cursor: 'pointer' }} />}
+                    <input 
+                        type={typeof value === 'number' ? 'number' : 'text'}
+                        value={value} 
+                        onChange={handleChange} 
+                        style={{ flex: 1, width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s', backgroundColor: '#f8fafc' }} 
+                        onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                        onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                    />
+                </div>
+            )}
+        </div>
+    );
+};
+
+const DynamicForm = ({ data, path = [], onChange, onAdd, onRemove }) => {
+    if (Array.isArray(data)) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {data.map((item, index) => (
+                    <div key={index} style={{ padding: '16px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ width: '20px', height: '2px', backgroundColor: '#cbd5e1' }}></span> Item {index + 1}
+                        </div>
+                        {typeof item === 'object' && item !== null ? (
+                            <DynamicForm data={item} path={[...path, index]} onChange={onChange} onAdd={onAdd} onRemove={onRemove} />
+                        ) : (
+                            <DynamicField value={item} path={[...path, index]} onChange={onChange} />
+                        )}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                            <button onClick={() => onRemove(path, index)} 
+                                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '6px', border: '1px solid #fecdd3', backgroundColor: '#fff1f2', color: '#e11d48', cursor: 'pointer', fontSize: '12px', fontWeight: 600 }}>
+                                <Trash2 size={12} /> Remove Item
+                            </button>
+                        </div>
+                    </div>
+                ))}
+                <button onClick={() => onAdd(path, data.length > 0 ? data[data.length - 1] : '')} 
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '12px', borderRadius: '8px', border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc', color: '#3b82f6', cursor: 'pointer', fontSize: '13px', fontWeight: 600, width: '100%' }}>
+                    <Plus size={16} /> Add New Item
+                </button>
+            </div>
+        );
+    }
+
+    if (typeof data === 'object' && data !== null) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {Object.keys(data).map(key => {
+                    const val = data[key];
+                    if (typeof val === 'object' && val !== null) {
+                        return (
+                            <div key={key} style={{ paddingLeft: '16px', borderLeft: '2px solid #e2e8f0', marginTop: '12px', marginBottom: '8px' }}>
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '12px', textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                                <DynamicForm data={val} path={[...path, key]} onChange={onChange} onAdd={onAdd} onRemove={onRemove} />
+                            </div>
+                        );
+                    }
+                    return <DynamicField key={key} label={key} value={val} path={[...path, key]} onChange={onChange} />;
+                })}
+            </div>
+        );
+    }
+
+    return null;
+};
 const ContentEditor = ({ token, cloneId, pages = [] }) => {
     const [content, setContent] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [expandedPage, setExpandedPage] = useState(null);
     const [editingItem, setEditingItem] = useState(null);
-    const [editData, setEditData] = useState('');
+    const [editData, setEditData] = useState(null);
     const [message, setMessage] = useState('');
 
     const headers = { Authorization: `Bearer ${token}` };
@@ -36,20 +136,69 @@ const ContentEditor = ({ token, cloneId, pages = [] }) => {
 
     const startEditing = (item) => {
         setEditingItem(item._id);
-        setEditData(JSON.stringify(item.data, null, 2));
+        setEditData(JSON.parse(JSON.stringify(item.data)));
+    };
+
+    const handleFieldChange = (path, value) => {
+        setEditData(prev => {
+            const newData = JSON.parse(JSON.stringify(prev));
+            let current = newData;
+            for (let i = 0; i < path.length - 1; i++) {
+                current = current[path[i]];
+            }
+            if (path.length > 0) {
+                current[path[path.length - 1]] = value;
+            }
+            return newData;
+        });
+    };
+
+    const handleAddArrayItem = (path, templateItem) => {
+        setEditData(prev => {
+            const newData = JSON.parse(JSON.stringify(prev));
+            let current = newData;
+            for (let i = 0; i < path.length; i++) {
+                current = current[path[i]];
+            }
+            // Clone the template item to avoid reference issues
+            let newItem = typeof templateItem === 'object' && templateItem !== null 
+                ? JSON.parse(JSON.stringify(templateItem)) 
+                : typeof templateItem === 'string' ? '' : templateItem;
+            
+            // Clear out values if it's an object to start fresh for the user
+            if (typeof newItem === 'object' && newItem !== null) {
+               Object.keys(newItem).forEach(key => {
+                   if (typeof newItem[key] === 'string') newItem[key] = '';
+                   if (typeof newItem[key] === 'number') newItem[key] = 0;
+               });
+            }
+            current.push(newItem);
+            return newData;
+        });
+    };
+
+    const handleRemoveArrayItem = (path, index) => {
+        setEditData(prev => {
+            const newData = JSON.parse(JSON.stringify(prev));
+            let current = newData;
+            for (let i = 0; i < path.length; i++) {
+                current = current[path[i]];
+            }
+            current.splice(index, 1);
+            return newData;
+        });
     };
 
     const saveContent = async (item) => {
         try {
             setSaving(true);
-            const parsed = JSON.parse(editData);
-            await axios.put(`${API_BASE}/content/${item._id}`, { data: parsed }, { headers });
-            setMessage('Content saved!');
+            await axios.put(`${API_BASE}/content/${item._id}`, { data: editData }, { headers });
+            setMessage('Content saved successfully!');
             setEditingItem(null);
             fetchContent();
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
-            setMessage(err.message === 'Unexpected token' ? 'Invalid JSON format' : 'Failed to save');
+            setMessage('Failed to save content');
         } finally {
             setSaving(false);
         }
@@ -114,16 +263,23 @@ const ContentEditor = ({ token, cloneId, pages = [] }) => {
                                             </div>
 
                                             {editingItem === item._id ? (
-                                                <textarea value={editData} onChange={e => setEditData(e.target.value)}
-                                                    style={{
-                                                        width: '100%', minHeight: '200px', padding: '12px', borderRadius: '8px',
-                                                        border: '1px solid #e2e8f0', fontFamily: 'monospace', fontSize: '13px',
-                                                        resize: 'vertical', outline: 'none', boxSizing: 'border-box'
-                                                    }} />
+                                                <div style={{ marginTop: '16px', padding: '16px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                                    <DynamicForm data={editData} onChange={handleFieldChange} onAdd={handleAddArrayItem} onRemove={handleRemoveArrayItem} />
+                                                </div>
                                             ) : (
-                                                <pre style={{ fontSize: '12px', color: '#64748b', overflow: 'auto', maxHeight: '200px', padding: '12px', backgroundColor: '#fff', borderRadius: '8px', margin: 0 }}>
-                                                    {JSON.stringify(item.data, null, 2)}
-                                                </pre>
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px', marginTop: '12px' }}>
+                                                    {Object.entries(item.data || {}).map(([key, val]) => {
+                                                        if (typeof val === 'object') return null; // Skip deep objects in preview
+                                                        return (
+                                                            <div key={key} style={{ padding: '12px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                                                <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                                                                <div style={{ fontSize: '13px', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                                    {typeof val === 'boolean' ? (val ? 'Yes' : 'No') : String(val)}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                             )}
                                         </div>
                                     ))}

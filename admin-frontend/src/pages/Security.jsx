@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, AlertTriangle, Loader2, RefreshCw, Lock, Wifi, AlertCircle, ShieldAlert } from 'lucide-react';
 import axios from 'axios';
+import './feature-pages.css';
 
 const API = 'http://localhost:5000/api/v1';
 
@@ -26,12 +27,8 @@ const Security = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh] relative z-10">
-                <div className="relative">
-                    <div className="w-16 h-16 rounded-full border-t-2 border-brand-500 border-l-2 border-transparent animate-spin" />
-                    <div className="w-16 h-16 rounded-full border-r-2 border-rose-500 border-b-2 border-transparent animate-spin absolute inset-0 animation-delay-500" />
-                    <Shield className="w-6 h-6 text-brand-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-                </div>
+            <div className="flex-center" style={{ minHeight: '60vh', position: 'relative', zIndex: 10 }}>
+                <div className="admin-loader"></div>
             </div>
         );
     }
@@ -39,28 +36,28 @@ const Security = () => {
     const d = data || {};
 
     return (
-        <div className="space-y-8 relative z-10 pb-10">
+        <div className="feature-page-container">
             {/* Header Content */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-gradient-to-r from-brand-600/10 to-rose-600/10 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
+            <div className="page-header-panel bg-brand-rose">
                 <div>
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="flex items-center gap-3 mb-2"
+                        className="header-title-box"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-rose-500 p-[1px]">
-                            <div className="w-full h-full bg-[#0f172a] rounded-[10px] flex items-center justify-center">
-                                <Shield className="w-5 h-5 text-rose-400" />
+                        <div className="header-icon-wrapper bg-brand-rose">
+                            <div className="header-icon-inner">
+                                <Shield className="w-5 h-5" style={{ color: '#f43f5e' }} />
                             </div>
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Security Center</h1>
+                        <h1 className="page-title">Security Center</h1>
                     </motion.div>
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-slate-400 font-medium ml-1"
+                        className="page-subtitle"
                     >
                         Monitor audit logs, suspicious activities, and system access
                     </motion.p>
@@ -71,83 +68,87 @@ const Security = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 }}
                     onClick={fetchData}
-                    className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-all flex items-center gap-2 group shadow-lg"
+                    className="btn-refresh"
                 >
-                    <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500 text-rose-400" />
-                    <span className="text-sm font-bold">Refresh Security</span>
+                    <RefreshCw className="icon" style={{ color: '#f43f5e' }} />
+                    <span className="btn-refresh-text">Refresh Security</span>
                 </motion.button>
             </div>
 
             {/* Top Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="metrics-grid metrics-grid-3">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                    className="glass-panel p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-red-500/30 transition-all">
-                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-red-500/20 rounded-full blur-[40px]" />
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                        <span className="text-slate-400 text-sm font-medium">Failed Logins</span>
-                        <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                            <Lock className="w-5 h-5 text-red-400" />
+                    className="metric-card metric-card-rose">
+                    <div className="metric-glow glow-rose" />
+                    <div className="metric-header">
+                        <span className="metric-title">Failed Logins</span>
+                        <div className="metric-icon-box box-rose">
+                            <Lock className="metric-icon icon-rose" />
                         </div>
                     </div>
-                    <h3 className="text-4xl font-black text-white tracking-tight relative z-10">{d.failedLogins || 0}</h3>
-                    <div className="flex items-center gap-1.5 mt-3 relative z-10 bg-white/5 w-max px-2.5 py-1 rounded-lg border border-white/10">
-                        <span className="text-red-400 text-xs font-bold uppercase tracking-wider">Last 24 Hours</span>
+                    <h3 className="metric-value">{d.failedLogins || 0}</h3>
+                    <div className="metric-footer footer-rose">
+                        <span className="footer-text">Last 24 Hours</span>
                     </div>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    className="glass-panel p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-amber-500/30 transition-all">
-                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-amber-500/20 rounded-full blur-[40px]" />
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                        <span className="text-slate-400 text-sm font-medium">Suspicious Activity</span>
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                            <AlertTriangle className="w-5 h-5 text-amber-400" />
+                    className="metric-card metric-card-amber">
+                    <div className="metric-glow glow-amber" />
+                    <div className="metric-header">
+                        <span className="metric-title">Suspicious Activity</span>
+                        <div className="metric-icon-box box-amber">
+                            <AlertTriangle className="metric-icon icon-amber" />
                         </div>
                     </div>
-                    <h3 className="text-4xl font-black text-white tracking-tight relative z-10">{d.suspiciousActivity || 0}</h3>
-                    <div className="flex items-center gap-1.5 mt-3 relative z-10 bg-white/5 w-max px-2.5 py-1 rounded-lg border border-white/10">
-                        <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Flagged Events</span>
+                    <h3 className="metric-value">{d.suspiciousActivity || 0}</h3>
+                    <div className="metric-footer footer-amber">
+                        <span className="footer-text">Flagged Events</span>
                     </div>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                    className="glass-panel p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden group hover:border-orange-500/30 transition-all">
-                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-orange-500/20 rounded-full blur-[40px]" />
-                    <div className="flex items-center justify-between mb-4 relative z-10">
-                        <span className="text-slate-400 text-sm font-medium">Webhook Failures</span>
-                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                            <Wifi className="w-5 h-5 text-orange-400" />
+                    className="metric-card theme-orange" style={{ '--color-primary-400': '#fb923c', '--theme-border': 'rgba(249, 115, 22, 0.2)', '--theme-bg': 'rgba(249, 115, 22, 0.1)' }}
+                    onMouseEnter={e => e.currentTarget.style.boxShadow = `0 20px 25px -5px rgba(249, 115, 22, 0.1), 0 8px 10px -6px rgba(249, 115, 22, 0.1)`}
+                    onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow-xl)'}
+                >
+                    <div className="metric-glow" style={{ backgroundColor: 'rgba(249, 115, 22, 0.2)' }} />
+                    <div className="metric-header">
+                        <span className="metric-title">Webhook Failures</span>
+                        <div className="metric-icon-box" style={{ backgroundColor: 'rgba(249, 115, 22, 0.1)', borderColor: 'rgba(249, 115, 22, 0.2)' }}>
+                            <Wifi style={{ width: '1.25rem', height: '1.25rem', color: '#fb923c' }} />
                         </div>
                     </div>
-                    <h3 className="text-4xl font-black text-white tracking-tight relative z-10">{d.webhookFailures || 0}</h3>
-                    <div className="flex items-center gap-1.5 mt-3 relative z-10 bg-white/5 w-max px-2.5 py-1 rounded-lg border border-white/10">
-                        <span className="text-orange-400 text-xs font-bold uppercase tracking-wider">Failed Dispatches</span>
+                    <h3 className="metric-value">{d.webhookFailures || 0}</h3>
+                    <div className="metric-footer" style={{ color: '#fb923c', backgroundColor: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
+                        <span className="footer-text">Failed Dispatches</span>
                     </div>
                 </motion.div>
             </div>
 
             {/* Audit Logs */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                className="glass-panel rounded-3xl border border-white/5 overflow-hidden shadow-2xl relative">
+                className="feature-table-panel"
+            >
 
                 <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-brand-500/5 rounded-full blur-[120px] pointer-events-none" />
 
-                <div className="p-6 border-b border-white/5 flex items-center gap-3 relative z-10 bg-black/20">
-                    <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                        <ShieldAlert className="w-4 h-4 text-brand-400" />
+                <div className="table-header-box">
+                    <div className="table-header-icon" style={{ backgroundColor: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
+                        <ShieldAlert style={{ width: '1rem', height: '1rem', color: 'var(--color-primary-600)' }} />
                     </div>
-                    <h2 className="text-lg font-bold text-white">System Audit Trail</h2>
+                    <h2 className="table-title">System Audit Trail</h2>
                 </div>
 
-                <div className="relative z-10">
+                <div className="audit-list-container">
                     {(!d.auditLogs || d.auditLogs.length === 0) ? (
-                        <div className="text-center py-20">
-                            <Shield className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                            <h3 className="text-lg font-bold text-white mb-2">No Audit Logs</h3>
-                            <p className="text-slate-500 text-sm font-medium">System activity and security events will appear here.</p>
+                        <div className="empty-state-large">
+                            <Shield style={{ width: '3rem', height: '3rem', color: 'var(--color-primary-600)', margin: '0 auto 1rem auto' }} />
+                            <h3 className="empty-title">No Audit Logs</h3>
+                            <p className="empty-desc">System activity and security events will appear here.</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-white/5 max-h-[500px] overflow-y-auto custom-scrollbar">
+                        <div className="audit-list custom-scrollbar">
                             <AnimatePresence>
                                 {d.auditLogs.map((log, i) => {
                                     const isWarning = log.action?.toLowerCase().includes('fail') || log.action?.toLowerCase().includes('delete');
@@ -157,32 +158,32 @@ const Security = () => {
                                             initial={{ opacity: 0, x: -10 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: i * 0.05 }}
-                                            className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors border-l-2 border-transparent group"
-                                            style={{ borderLeftColor: isWarning ? 'rgba(244, 63, 94, 0.4)' : 'rgba(139, 92, 246, 0.4)' }}
+                                            className="audit-item"
+                                            style={{ borderLeftColor: isWarning ? 'rgba(244, 63, 94, 0.4)' : 'rgba(99, 102, 241, 0.4)' }}
                                         >
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-3 mb-1.5">
-                                                    <span className="text-xs font-mono font-bold text-slate-500 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                                            <div className="audit-content">
+                                                <div className="audit-header-row">
+                                                    <span className="audit-time">
                                                         {log.date ? new Date(log.date).toLocaleTimeString() : '00:00:00'}
                                                     </span>
-                                                    <p className="text-white text-sm font-medium truncate group-hover:text-brand-300 transition-colors">
+                                                    <p className="audit-action">
                                                         {log.action || 'Unknown Action'}
                                                     </p>
                                                     {isWarning && (
-                                                        <AlertCircle className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
+                                                        <AlertCircle style={{ width: '0.875rem', height: '0.875rem', color: '#f43f5e', flexShrink: 0 }} />
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-brand-400 text-xs font-bold uppercase tracking-wider bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">
+                                                <div className="audit-meta-row">
+                                                    <span className="audit-user">
                                                         {log.user || 'System'}
                                                     </span>
-                                                    <span className="text-slate-500 text-xs font-medium">
+                                                    <span className="audit-ip">
                                                         • IP: {log.ip || '-'}
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="shrink-0 flex items-center">
-                                                <span className="text-slate-400 font-medium text-xs">
+                                            <div className="audit-date-container">
+                                                <span className="audit-date">
                                                     {log.date ? new Date(log.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                                                 </span>
                                             </div>

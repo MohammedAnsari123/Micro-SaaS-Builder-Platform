@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { BarChart3, Activity, Users, Globe, PieChart, Loader2, ArrowUpRight } from 'lucide-react';
 import axios from 'axios';
 
+import '../styles/analytics.css';
+import '../styles/pages.css';
+
 const Analytics = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -28,47 +31,47 @@ const Analytics = () => {
 
     if (loading) {
         return (
-            <div className="h-full flex items-center justify-center p-20">
-                <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+            <div className="analytics-empty">
+                <Loader2 style={{ width: '40px', height: '40px', color: 'var(--color-secondary)' }} className="animate-spin" />
             </div>
         );
     }
 
     if (!stats) {
         return (
-            <div className="h-full flex flex-col items-center justify-center p-20 gap-4">
-                <BarChart3 className="w-10 h-10 text-slate-600" />
-                <p className="text-slate-400 font-medium">No analytics data available yet.</p>
+            <div className="analytics-empty">
+                <BarChart3 style={{ width: '40px', height: '40px', color: 'var(--color-text-muted)' }} />
+                <p style={{ color: 'var(--color-text-muted)', fontWeight: 500 }}>No analytics data available yet.</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
-            <div className="bg-gradient-to-r from-blue-600/10 to-indigo-600/10 p-8 rounded-3xl border border-blue-500/10 backdrop-blur-md">
-                <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
-                    <BarChart3 className="w-6 h-6 text-blue-400" /> Platform-Wide Analytics
+        <div className="page-container">
+            <div className="analytics-header">
+                <h2 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <BarChart3 style={{ color: 'var(--color-secondary)' }} /> Platform-Wide Analytics
                 </h2>
-                <p className="text-slate-400 font-medium">Deep dive into traffic patterns and user engagement across your SaaS portfolio.</p>
+                <p className="page-subtitle" style={{ marginTop: '8px' }}>Deep dive into traffic patterns and user engagement across your SaaS portfolio.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="analytics-grid">
                 {/* Traffic Distribution */}
-                <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="font-bold text-white text-lg">Traffic Volume (7D)</h3>
-                        <div className="flex gap-2">
-                            <div className="w-3 h-3 rounded-full bg-blue-500" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-0.5">API INGRESS</span>
+                <div className="analytics-card">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+                        <h3 className="page-title" style={{ fontSize: '1.125rem' }}>Traffic Volume (7D)</h3>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--color-secondary)' }} />
+                            <span className="metric-label" style={{ marginBottom: 0 }}>API INGRESS</span>
                         </div>
                     </div>
-                    <div className="h-64 flex items-end gap-3 mt-4">
+                    <div className="analytics-chart-container">
                         {stats.apiTraffic.map((h, i) => (
-                            <div key={i} className="flex-1 bg-slate-800/50 rounded-lg relative group">
+                            <div key={i} className="analytics-bar">
                                 <motion.div
                                     initial={{ height: 0 }}
                                     animate={{ height: `${(h / Math.max(...stats.apiTraffic, 1)) * 100}%` }}
-                                    className="absolute bottom-0 inset-x-0 bg-blue-500/30 rounded-lg border-t border-blue-400/50 group-hover:bg-blue-500/50 transition-all"
+                                    className="analytics-bar-fill"
                                 />
                             </div>
                         ))}
@@ -76,26 +79,26 @@ const Analytics = () => {
                 </div>
 
                 {/* Engagement Metrics */}
-                <div className="space-y-4">
-                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Top Region</h4>
-                        <div className="flex items-center justify-between">
-                            <span className="text-white font-bold flex items-center gap-2"><Globe className="w-4 h-4 text-emerald-400" /> North America</span>
-                            <span className="text-emerald-400 font-bold text-sm">42%</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="metric-card">
+                        <h4 className="metric-label">Top Region</h4>
+                        <div className="metric-row">
+                            <span className="metric-value"><Globe style={{ width: '16px', height: '16px', color: 'rgb(52, 211, 153)' }} /> North America</span>
+                            <span className="metric-highlight">42%</span>
                         </div>
                     </div>
-                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Error Rate</h4>
-                        <div className="flex items-center justify-between">
-                            <span className="text-white font-bold flex items-center gap-2"><Activity className="w-4 h-4 text-rose-400" /> System Healthy</span>
-                            <span className="text-emerald-400 font-bold text-sm">0.05%</span>
+                    <div className="metric-card">
+                        <h4 className="metric-label">Error Rate</h4>
+                        <div className="metric-row">
+                            <span className="metric-value"><Activity style={{ width: '16px', height: '16px', color: 'rgb(251, 113, 133)' }} /> System Healthy</span>
+                            <span className="metric-highlight">0.05%</span>
                         </div>
                     </div>
-                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 overflow-hidden relative">
-                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">User Growth</h4>
-                        <div className="flex items-end justify-between relative z-10">
-                            <span className="text-3xl font-bold text-white tracking-tighter">+{stats.activeUsers.split(',')[0]}%</span>
-                            <PieChart className="w-10 h-10 text-blue-500/20 absolute -right-2 -bottom-2" />
+                    <div className="metric-card">
+                        <h4 className="metric-label">User Growth</h4>
+                        <div className="metric-row" style={{ position: 'relative', zIndex: 10 }}>
+                            <span style={{ fontSize: '2.25rem', fontWeight: 800, color: 'white' }}>+{stats.activeUsers.split(',')[0]}%</span>
+                            <PieChart style={{ width: '60px', height: '60px', color: 'rgba(0, 212, 255, 0.1)', position: 'absolute', right: '-10px', bottom: '-10px', zIndex: -1 }} />
                         </div>
                     </div>
                 </div>

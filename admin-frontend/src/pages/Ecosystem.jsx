@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Search, ShieldAlert, Trash2, Loader2, RefreshCw, ExternalLink, User, LayoutTemplate, CheckCircle, Ban } from 'lucide-react';
 import axios from 'axios';
+import './feature-pages.css';
+import './users-table.css';
 
 const API = 'http://localhost:5000/api/v1';
 
@@ -68,39 +70,35 @@ const Ecosystem = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh] relative z-10">
-                <div className="relative">
-                    <div className="w-16 h-16 rounded-full border-t-2 border-brand-500 border-l-2 border-transparent animate-spin" />
-                    <div className="w-16 h-16 rounded-full border-r-2 border-emerald-500 border-b-2 border-transparent animate-spin absolute inset-0 animation-delay-500" />
-                    <Globe className="w-6 h-6 text-emerald-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-                </div>
+            <div className="flex-center" style={{ minHeight: '60vh', position: 'relative', zIndex: 10 }}>
+                <div className="admin-loader"></div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 relative z-10 pb-10">
+        <div className="feature-page-container">
             {/* Header Content */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-gradient-to-r from-emerald-600/10 to-blue-600/10 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
+            <div className="page-header-panel bg-emerald-blue">
                 <div>
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="flex items-center gap-3 mb-2"
+                        className="header-title-box"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-blue-600 p-[1px]">
-                            <div className="w-full h-full bg-[#0f172a] rounded-[10px] flex items-center justify-center">
-                                <Globe className="w-5 h-5 text-emerald-400" />
+                        <div className="header-icon-wrapper bg-emerald-blue">
+                            <div className="header-icon-inner">
+                                <Globe className="w-5 h-5" style={{ color: 'var(--color-success)' }} />
                             </div>
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">All Deployed Sites</h1>
+                        <h1 className="page-title">All Deployed Sites</h1>
                     </motion.div>
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-slate-400 font-medium ml-1"
+                        className="page-subtitle"
                     >
                         Monitor and manage all provisioned Micro-SaaS instances ({clones.length} total)
                     </motion.p>
@@ -110,10 +108,10 @@ const Ecosystem = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="flex gap-3"
+                    className="action-buttons-container"
                 >
-                    <button onClick={fetchClones} className="px-3.5 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-all flex items-center gap-2 group">
-                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                    <button onClick={fetchClones} className="btn-refresh" title="Refresh Data">
+                        <RefreshCw className="icon" />
                     </button>
                 </motion.div>
             </div>
@@ -123,18 +121,18 @@ const Ecosystem = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex items-center"
+                className="filter-bar"
             >
-                <div className="relative w-full max-w-lg group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search className="w-5 h-5 text-slate-500 group-focus-within:text-emerald-400 transition-colors" />
+                <div className="search-input-container">
+                    <div className="search-icon-box">
+                        <Search className="search-icon" />
                     </div>
                     <input
                         type="text"
                         placeholder="Search by site name, owner, or domain..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full bg-black/20 border border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:bg-white/5 transition-all text-sm shadow-inner"
+                        className="search-input"
                     />
                 </div>
             </motion.div>
@@ -144,30 +142,30 @@ const Ecosystem = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="glass-panel rounded-3xl overflow-hidden shadow-2xl relative"
+                className="data-table-container shadow-2xl"
             >
-                <div className="overflow-x-auto relative z-10 custom-scrollbar pb-2">
-                    <table className="w-full text-left text-sm border-collapse">
+                <div className="data-table-wrapper custom-scrollbar pb-2">
+                    <table className="admin-data-table">
                         <thead>
-                            <tr className="bg-black/20 border-b border-white/5 text-slate-400 uppercase tracking-wider text-[11px] font-bold">
-                                <th className="p-5 font-semibold">Instance / Site</th>
-                                <th className="p-5 font-semibold">Owner & Domain</th>
-                                <th className="p-5 font-semibold">Template</th>
-                                <th className="p-5 font-semibold">Status</th>
-                                <th className="p-5 text-center font-semibold text-slate-500">Global Actions</th>
+                            <tr>
+                                <th>Instance / Site</th>
+                                <th>Owner & Domain</th>
+                                <th>Template</th>
+                                <th>Status</th>
+                                <th style={{ textAlign: 'center' }}>Global Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody>
                             <AnimatePresence>
                                 {filtered.length === 0 ? (
                                     <tr>
                                         <td colSpan="5">
-                                            <div className="py-20 text-center">
-                                                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                                                    <Globe className="w-8 h-8 text-slate-500" />
+                                            <div className="empty-state-large">
+                                                <div className="empty-icon-circle">
+                                                    <Globe style={{ width: '2rem', height: '2rem', color: 'var(--color-primary-500)' }} />
                                                 </div>
-                                                <h3 className="text-lg font-bold text-white mb-2">No provisioned sites found</h3>
-                                                <p className="text-slate-400 text-sm">Deploy templates from the user dashboard to see them here.</p>
+                                                <h3 className="empty-title">No provisioned sites found</h3>
+                                                <p className="empty-desc">Deploy templates from the user dashboard to see them here.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -180,63 +178,65 @@ const Ecosystem = () => {
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: 10 }}
                                                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                                                className="hover:bg-white/[0.03] transition-colors group cursor-pointer border-l-[3px] border-transparent hover:border-emerald-500"
+                                                className="table-row hover:border-emerald-500"
                                             >
                                                 <td className="p-5">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-emerald-500/30 transition-colors shadow-lg">
-                                                            <LayoutTemplate className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
+                                                    <div className="user-cell-content">
+                                                        <div className="user-avatar-placeholder" style={{ backgroundImage: 'linear-gradient(to bottom right, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2))', border: '1px solid var(--color-border)' }}>
+                                                            <LayoutTemplate style={{ width: '1.5rem', height: '1.5rem', color: '#60a5fa' }} className="group-hover:scale-110 transition-transform duration-300" />
                                                         </div>
                                                         <div>
-                                                            <div className="font-bold text-white text-[16px] group-hover:text-emerald-300 transition-colors">{c.siteName}</div>
-                                                            <div className="text-slate-500 text-[11px] mt-1 font-bold uppercase tracking-widest">
+                                                            <div className="user-name-text group-hover:text-emerald-500">{c.siteName}</div>
+                                                            <div className="user-email-text mt-1 font-bold uppercase tracking-widest" style={{ fontSize: '11px' }}>
                                                                 Cloned {new Date(c.clonedAt).toLocaleDateString()}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="p-5">
-                                                    <div className="flex items-center gap-2 text-white font-medium">
-                                                        <User className="w-3.5 h-3.5 text-slate-500" /> {c.owner}
+                                                    <div className="flex-center" style={{ justifyContent: 'flex-start', gap: '0.5rem', color: 'var(--color-text-main)', fontWeight: 500 }}>
+                                                        <User style={{ width: '0.875rem', height: '0.875rem', color: 'var(--color-primary-500)' }} /> {c.owner}
                                                     </div>
-                                                    <div className="text-emerald-400/80 text-xs flex items-center gap-1 mt-1 font-medium italic">
-                                                        <ExternalLink className="w-3 h-3" />
+                                                    <div style={{ color: 'var(--color-success)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem', fontWeight: 500, fontStyle: 'italic' }}>
+                                                        <ExternalLink style={{ width: '0.75rem', height: '0.75rem' }} />
                                                         <a
                                                             href={`http://localhost:5173/site/${c.templateSlug || 'unknown-template'}/${c.emailPrefix || 'unknown-user'}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="hover:underline"
+                                                            style={{ textDecoration: 'none', color: 'inherit' }}
+                                                            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                                                            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
                                                         >
                                                             {c.domain} (Preview)
                                                         </a>
                                                     </div>
                                                 </td>
                                                 <td className="p-5">
-                                                    <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300 font-bold text-[11px] uppercase tracking-wider">
+                                                    <span className="badge badge-admin">
                                                         {c.template}
                                                     </span>
                                                 </td>
                                                 <td className="p-5">
-                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm ${c.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
-                                                        {c.status === 'active' ? <CheckCircle className="w-3 h-3" /> : <Ban className="w-3 h-3" />}
+                                                    <span className={`badge ${c.status === 'active' ? 'badge-status-active' : 'badge-status-suspended'}`}>
+                                                        {c.status === 'active' ? <CheckCircle style={{ width: '0.75rem', height: '0.75rem' }} /> : <Ban style={{ width: '0.75rem', height: '0.75rem' }} />}
                                                         {c.status}
                                                     </span>
                                                 </td>
                                                 <td className="p-5">
-                                                    <div className="flex items-center justify-center gap-2">
+                                                    <div className="action-buttons-group flex-center">
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); handleUpdateStatus(c._id, c.status); }}
-                                                            className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center transition-all group/btn border border-transparent ${c.status === 'active' ? 'hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/30' : 'hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/30'}`}
+                                                            className={`btn-icon-action ${c.status === 'active' ? 'btn-suspend' : 'btn-restore'}`}
                                                             title={c.status === 'active' ? 'Ban Site' : 'Restore Site'}
                                                         >
-                                                            {c.status === 'active' ? <Ban className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                                                            {c.status === 'active' ? <Ban style={{ width: '1rem', height: '1rem' }} /> : <CheckCircle style={{ width: '1rem', height: '1rem' }} />}
                                                         </button>
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); handleDelete(c._id); }}
-                                                            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-rose-600/30 text-slate-400 hover:text-rose-500 border border-transparent hover:border-rose-600/30 flex items-center justify-center transition-all"
+                                                            className="btn-icon-action btn-delete"
                                                             title="Permanent Remove"
                                                         >
-                                                            <Trash2 className="w-4 h-4 text-rose-500" />
+                                                            <Trash2 style={{ width: '1rem', height: '1rem' }} />
                                                         </button>
                                                     </div>
                                                 </td>
