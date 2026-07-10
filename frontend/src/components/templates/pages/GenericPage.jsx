@@ -3,6 +3,44 @@ import { useContent } from '../../../context/ContentContext';
 import { motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import HeroSection from '../sections/HeroSection';
+import axios from 'axios';
+
+const CptQueryBlock = ({ cptSlug }) => {
+    const { tenantId } = useContent();
+    const [records, setRecords] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!cptSlug || !tenantId) return;
+        axios.get(`http://localhost:5000/api/v1/cpt/entries/${cptSlug}?tenantId=${tenantId}`)
+            .then(res => {
+                if (res.data.success) setRecords(res.data.data);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+    }, [cptSlug, tenantId]);
+
+    if (loading) return <div style={{ fontSize: '12px', color: '#64748b', textAlign: 'center', padding: '12px' }}>Loading dynamic content...</div>;
+    if (records.length === 0) return null;
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', margin: '24px 0' }}>
+            {records.map((item, idx) => (
+                <div key={idx} style={{ padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                    {Object.entries(item).map(([key, val]) => {
+                        if (['_id', 'tenantId', 'createdAt', 'updatedAt', '__v'].includes(key)) return null;
+                        return (
+                            <div key={key} style={{ marginBottom: '8px' }}>
+                                <span style={{ fontSize: '10px', textTransform: 'uppercase', color: '#94a3b8', fontWeight: 700 }}>{key}</span>
+                                <p style={{ margin: 0, fontSize: '14px', color: '#334155', fontWeight: 500 }}>{String(val)}</p>
+                            </div>
+                        );
+                    })}
+                </div>
+            ))}
+        </div>
+    );
+};
 
 const GenericPage = ({ pageSlug }) => {
     const { fetchPageContent, getPageContent } = useContent();
@@ -192,6 +230,35 @@ const GenericPage = ({ pageSlug }) => {
 
             case 'info':
                 return null; // Handled by ContactSection
+
+            case 'blocks':
+                return (
+                    <div key={sectionKey} style={{ padding: '40px 0' }}>
+                        {Array.isArray(data.items) && data.items.map((block, idx) => {
+                            switch (block.type) {
+                                case 'heading':
+                                    return <h2 key={idx} style={{ fontSize: '28px', fontWeight: 800, textAlign: 'center', marginBottom: '24px', color: 'var(--color-text)' }}>{block.attributes?.text}</h2>;
+                                case 'paragraph':
+                                    return <p key={idx} style={{ fontSize: '16px', lineHeight: 1.8, color: '#64748b', maxWidth: '700px', margin: '0 auto 16px', textAlign: block.attributes?.align || 'left' }}>{block.attributes?.text}</p>;
+                                case 'columns':
+                                    return (
+                                        <div key={idx} style={{ display: 'grid', gridTemplateColumns: `repeat(${block.attributes?.columns || 2}, 1fr)`, gap: '24px', margin: '24px 0' }}>
+                                            {Array.isArray(block.children) && block.children.map((child, cIdx) => (
+                                                <div key={cIdx} style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                                    {child.type === 'heading' && <h3 style={{ fontWeight: 700, marginBottom: '8px' }}>{child.attributes?.text}</h3>}
+                                                    {child.type === 'paragraph' && <p style={{ color: '#64748b', fontSize: '14px' }}>{child.attributes?.text}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                case 'cpt_query':
+                                    return <CptQueryBlock key={idx} cptSlug={block.attributes?.cptSlug} />;
+                                default:
+                                    return null;
+                            }
+                        })}
+                    </div>
+                );
 
             default:
                 return null;

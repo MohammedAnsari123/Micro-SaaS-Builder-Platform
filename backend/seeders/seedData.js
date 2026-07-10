@@ -174,5 +174,35 @@ module.exports = {
             { name: 'Yoga Mat Premium', description: 'Extra thick, non-slip yoga mat for all practices.', price: 39.99, category: 'Sports', isAvailable: true, order: 4 },
             { name: 'LED Desk Lamp', description: 'Adjustable LED lamp with wireless charging base.', price: 54.99, category: 'Home & Garden', isAvailable: true, order: 5 }
         ]
+    },
+
+    'real-estate': {
+        content: [
+            { page: 'home', section: 'hero', data: { title: 'Find Your Dream Home', subtitle: 'Luxurious Properties', description: 'Browse the finest real estate listings in prime locations. Buy, sell, or rent with confidence.', cta: 'Browse Properties', ctaLink: '/properties' }, order: 0 },
+            { page: 'home', section: 'highlights', data: { title: 'Our Core Value', items: [{ name: 'Vetted Listings', description: 'All properties are verified for quality and pricing.' }, { name: 'Expert Agents', description: 'Top agents to guide you through every transaction step.' }, { name: 'Virtual Tours', description: 'High-quality virtual viewings from your sofa.' }] }, order: 1 },
+            { page: 'properties', section: 'hero', data: { title: 'Available Properties', description: 'Explore premium residential and commercial listings.' }, order: 0 },
+            { page: 'properties', section: 'featured_projects', data: { title: 'Featured Listings', items: [{ name: 'Luxury Villa', description: '5-bedroom ocean view villa with pool', tech: 'Location: Miami' }, { name: 'Modern Apartment', description: '2-bedroom downtown smart apartment', tech: 'Location: New York' }, { name: 'Penthouse suite', description: 'High rise penthouse with private elevator', tech: 'Location: Chicago' }] }, order: 1 },
+            { page: 'agents', section: 'hero', data: { title: 'Meet Our Experts', description: 'Our team of professional real estate agents is here to help.' }, order: 0 },
+            { page: 'agents', section: 'team', data: { title: 'Top Performers', items: [{ name: 'Alice Cooper', role: 'Residential Specialist', bio: '7+ years luxury market experience' }, { name: 'Bob Dylan', role: 'Commercial Advisor', bio: '12+ years asset acquisition specialist' }] }, order: 1 },
+            { page: 'contact', section: 'hero', data: { title: 'Get In Touch', description: 'Contact an agent or request a viewing schedule.' }, order: 0 },
+            { page: 'contact', section: 'info', data: { email: 'sales@realestate.com', phone: '+1 800 333 4455', location: 'Beverly Hills, CA' }, order: 1 }
+        ]
+    },
+
+    'medical-clinic': {
+        content: [
+            { page: 'home', section: 'hero', data: { title: 'Your Health, Our Priority', subtitle: 'Care & Diagnostics', description: 'Modern outpatient care, medical diagnostics, and specialist treatment for all age groups.', cta: 'Book Appointment', ctaLink: '/book' }, order: 0 },
+            { page: 'home', section: 'hours', data: { title: 'Clinic Schedule', items: [{ day: 'Mon - Fri', hours: '8:00 AM - 8:00 PM' }, { day: 'Saturday', hours: '9:00 AM - 5:00 PM' }, { day: 'Sunday', hours: 'Emergencies Only' }] }, order: 1 },
+            { page: 'services', section: 'hero', data: { title: 'Our Treatments & Services', description: 'State-of-the-art medical and diagnostic procedures.' }, order: 0 },
+            { page: 'book', section: 'hero', data: { title: 'Schedule Medical Consultation', description: 'Choose your medical specialty and reserve a consultation time.' }, order: 0 },
+            { page: 'contact', section: 'hero', data: { title: 'Location & Emergency Contact', description: 'Find us or call our 24/7 care hotline.' }, order: 0 },
+            { page: 'contact', section: 'info', data: { email: 'care@medicalclinic.com', phone: '+1 800 777 9900', address: '12 Medical Plaza, Boston MA' }, order: 1 }
+        ],
+        services: [
+            { name: 'General Consultation', description: 'Primary health checkup and diagnostic evaluation.', duration: '20 min', price: 50, category: 'Primary Care', isAvailable: true, order: 0 },
+            { name: 'Pediatric Care', description: 'Comprehensive medical care for infants, children, and adolescents.', duration: '30 min', price: 60, category: 'Specialist', isAvailable: true, order: 1 },
+            { name: 'Cardiac Screening', description: 'ECG and cardiovascular risk diagnostic check.', duration: '45 min', price: 120, category: 'Diagnostics', isAvailable: true, order: 2 },
+            { name: 'Dental Cleaning', description: 'Professional teeth scaling, polishing, and oral exam.', duration: '40 min', price: 75, category: 'Dental', isAvailable: true, order: 3 }
+        ]
     }
 };

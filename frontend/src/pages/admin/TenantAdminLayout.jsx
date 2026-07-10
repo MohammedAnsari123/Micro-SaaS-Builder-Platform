@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     LayoutDashboard, FileText, Palette, Settings, MessageSquare,
-    ShoppingBag, Calendar, Package, Scissors, Users, ChevronLeft, ChevronRight, LogOut, Globe
+    ShoppingBag, Calendar, Package, Scissors, Users, ChevronLeft, ChevronRight, LogOut, Globe, Database, TrendingUp
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -12,6 +12,8 @@ import ThemeEditor from './ThemeEditor';
 import SiteSettingsEditor from './SiteSettingsEditor';
 import ContactMessages from './ContactMessages';
 import ModuleManager from './ModuleManager';
+import CptManager from './CptManager';
+import AnalyticsDashboard from './AnalyticsDashboard';
 
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import '../../styles/admin.css';
@@ -68,10 +70,12 @@ const TenantAdminLayout = ({ token, onLogout }) => {
     const publicUrl = template && emailPrefix && cloneId ? `/site/${template.slug}/${emailPrefix}/${cloneId}` : '#';
 
     const menuItems = [
+        { key: 'analytics', label: 'Analytics', icon: TrendingUp, always: true },
         { key: 'content', label: 'Content', icon: FileText, always: true },
         { key: 'theme', label: 'Theme', icon: Palette, always: true },
         { key: 'settings', label: 'Site Settings', icon: Settings, always: true },
         { key: 'contacts', label: 'Messages', icon: MessageSquare, always: true },
+        { key: 'cpt', label: 'Custom Post Types', icon: Database, always: true },
         { key: 'products', label: 'Products', icon: ShoppingBag, module: 'product' },
         { key: 'orders', label: 'Orders', icon: Package, module: 'order' },
         { key: 'bookings', label: 'Bookings', icon: Calendar, module: 'booking' },
@@ -82,17 +86,19 @@ const TenantAdminLayout = ({ token, onLogout }) => {
 
     const renderPage = () => {
         switch (activePage) {
+            case 'analytics': return <AnalyticsDashboard token={token} cloneId={cloneId} />;
             case 'content': return <ContentEditor token={token} cloneId={cloneId} pages={template?.pages || []} />;
             case 'theme': return <ThemeEditor token={token} cloneId={cloneId} />;
             case 'settings': return <SiteSettingsEditor token={token} cloneId={cloneId} />;
             case 'contacts': return <ContactMessages token={token} cloneId={cloneId} />;
+            case 'cpt': return <CptManager token={token} tenantId={tenantInfo?.tenantId || tenantInfo?._id} />;
             case 'products': return <ModuleManager token={token} cloneId={cloneId} module="products" title="Products" />;
             case 'orders': return <ModuleManager token={token} cloneId={cloneId} module="orders" title="Orders" />;
             case 'bookings': return <ModuleManager token={token} cloneId={cloneId} module="bookings" title="Bookings" />;
             case 'services': return <ModuleManager token={token} cloneId={cloneId} module="services" title="Services" />;
             case 'events': return <ModuleManager token={token} cloneId={cloneId} module="events" title="Events" />;
             case 'registrations': return <ModuleManager token={token} cloneId={cloneId} module="registrations" title="Registrations" />;
-            default: return <ContentEditor token={token} cloneId={cloneId} pages={template?.pages || []} />;
+            default: return <AnalyticsDashboard token={token} cloneId={cloneId} />;
         }
     };
 

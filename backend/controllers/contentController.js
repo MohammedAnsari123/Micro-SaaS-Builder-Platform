@@ -1,4 +1,5 @@
 const Content = require('../models/Content');
+const redis = require('../config/redis');
 
 // @desc    Get all content for a page (tenant-isolated)
 // @route   GET /api/v1/content?page=home&cloneId=...
@@ -10,7 +11,7 @@ exports.getPageContent = async (req, res, next) => {
         if (page) filter.page = page.toLowerCase();
         if (cloneId) filter.cloneId = cloneId;
 
-        const content = await Content.find(filter).sort('order');
+        const content = await Content.find(filter).sort('order').lean();
         res.status(200).json({ success: true, count: content.length, data: content });
     } catch (err) {
         next(err);
@@ -24,10 +25,32 @@ exports.getPublicContent = async (req, res, next) => {
     try {
         const { tenantId, cloneId } = req.params;
         const { page } = req.query;
+        const pageKey = page ? page.toLowerCase() : 'all';
+        const cacheKey = `content:public:${tenantId}:${cloneId}:${pageKey}`;
+
+        // Try getting from cache
+        try {
+            const cachedData = await redis.get(cacheKey);
+            if (cachedData) {
+                const content = JSON.parse(cachedData);
+                return res.status(200).json({ success: true, count: content.length, data: content, cached: true });
+            }
+        } catch (cacheErr) {
+            console.warn('Redis read error:', cacheErr.message);
+        }
+
         const filter = { tenantId, cloneId };
         if (page) filter.page = page.toLowerCase();
 
-        const content = await Content.find(filter).sort('order');
+        const content = await Content.find(filter).sort('order').lean();
+
+        // Cache result in Redis (TTL: 1 hour)
+        try {
+            await redis.set(cacheKey, JSON.stringify(content), 'EX', 3600);
+        } catch (cacheErr) {
+            console.warn('Redis write error:', cacheErr.message);
+        }
+
         res.status(200).json({ success: true, count: content.length, data: content });
     } catch (err) {
         next(err);
@@ -43,7 +66,7 @@ exports.getAllContent = async (req, res, next) => {
         const filter = { tenantId: req.tenantId };
         if (cloneId) filter.cloneId = cloneId;
 
-        const content = await Content.find(filter).sort('page order');
+        const content = await Content.find(filter).sort('page order').lean();
         res.status(200).json({ success: true, count: content.length, data: content });
     } catch (err) {
         next(err);
@@ -66,6 +89,15 @@ exports.upsertContent = async (req, res, next) => {
             { data, order: order || 0 },
             { new: true, upsert: true, runValidators: true }
         );
+
+        // Invalidate Redis cache
+        try {
+            const pageKey = page.toLowerCase();
+            await redis.del(`content:public:${req.tenantId}:${cloneId}:${pageKey}`);
+            await redis.del(`content:public:${req.tenantId}:${cloneId}:all`);
+        } catch (cacheErr) {
+            console.warn('Redis delete error:', cacheErr.message);
+        }
 
         res.status(200).json({ success: true, data: content });
     } catch (err) {
@@ -90,6 +122,15 @@ exports.updateContent = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Content not found' });
         }
 
+        // Invalidate Redis cache
+        try {
+            const pageKey = content.page ? content.page.toLowerCase() : 'all';
+            await redis.del(`content:public:${req.tenantId}:${content.cloneId}:${pageKey}`);
+            await redis.del(`content:public:${req.tenantId}:${content.cloneId}:all`);
+        } catch (cacheErr) {
+            console.warn('Redis delete error:', cacheErr.message);
+        }
+
         res.status(200).json({ success: true, data: content });
     } catch (err) {
         next(err);
@@ -105,6 +146,15 @@ exports.deleteContent = async (req, res, next) => {
 
         if (!content) {
             return res.status(404).json({ success: false, message: 'Content not found' });
+        }
+
+        // Invalidate Redis cache
+        try {
+            const pageKey = content.page ? content.page.toLowerCase() : 'all';
+            await redis.del(`content:public:${req.tenantId}:${content.cloneId}:${pageKey}`);
+            await redis.del(`content:public:${req.tenantId}:${content.cloneId}:all`);
+        } catch (cacheErr) {
+            console.warn('Redis delete error:', cacheErr.message);
         }
 
         res.status(200).json({ success: true, data: {} });

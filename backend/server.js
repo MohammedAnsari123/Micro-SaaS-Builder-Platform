@@ -63,6 +63,9 @@ app.use('/api/v1/bookings', require('./routes/bookingRoutes'));
 app.use('/api/v1/services', require('./routes/serviceRoutes'));
 app.use('/api/v1/events', require('./routes/eventRoutes'));
 app.use('/api/v1/registrations', require('./routes/registrationRoutes'));
+app.use('/api/v1/cpt', require('./routes/cptRoutes'));
+app.use('/api/v1/ai', require('./routes/aiRoutes'));
+app.use('/api/v1/stats', require('./routes/statsRoutes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

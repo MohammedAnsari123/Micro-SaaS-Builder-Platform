@@ -16,6 +16,19 @@ const ThemeProvider = ({ children, themeOverride }) => {
         root.style.setProperty('--color-text', theme.text || '#0f172a');
         root.style.setProperty('--font-family', theme.font || 'Inter, sans-serif');
 
+        // Advanced variables
+        root.style.setProperty('--border-radius', theme.borderRadius || '8px');
+        
+        const getShadowValue = (style) => {
+            switch (style) {
+                case 'glass': return '0 8px 32px 0 rgba(31, 38, 135, 0.08)';
+                case 'flat': return 'none';
+                case 'soft':
+                default: return '0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)';
+            }
+        };
+        root.style.setProperty('--box-shadow', getShadowValue(theme.shadow));
+
         return () => {
             root.style.removeProperty('--color-primary');
             root.style.removeProperty('--color-secondary');
@@ -23,6 +36,8 @@ const ThemeProvider = ({ children, themeOverride }) => {
             root.style.removeProperty('--color-background');
             root.style.removeProperty('--color-text');
             root.style.removeProperty('--font-family');
+            root.style.removeProperty('--border-radius');
+            root.style.removeProperty('--box-shadow');
         };
     }, [theme]);
 

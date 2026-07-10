@@ -116,7 +116,7 @@ const Tenants = () => {
             <div className="data-container">
                 <div className="data-toolbar">
                     <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--border-radius-xl)', padding: '4px', border: '1px solid var(--color-border)' }}>
-                        <button style={{ padding: '6px 16px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,255,255,0.1)', color: 'white', borderRadius: 'var(--border-radius-lg)', border: 'none', cursor: 'pointer' }}>All ({websites.length})</button>
+                        <button style={{ padding: '6px 16px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,255,255,0.1)', color: 'black', borderRadius: 'var(--border-radius-lg)', border: 'none', cursor: 'pointer' }}>All ({websites.length})</button>
                     </div>
                     <div className="data-filter">
                         <Search className="data-filter-icon" />

@@ -15,7 +15,7 @@ try {
     });
 } catch (e) {
     console.warn('Redis initialization skipped.');
-    redis = { on: () => { }, get: () => null, set: () => null };
+    redis = { on: () => { }, get: () => null, set: () => null, del: () => null };
 }
 
 module.exports = redis;

@@ -100,26 +100,49 @@ const ThemeEditor = ({ token, cloneId }) => {
             </div>
 
             {/* Font */}
-            <div style={{ marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>Font Family</h3>
-                <select value={theme.font} onChange={e => setTheme(p => ({ ...p, font: e.target.value }))}
-                    style={{ padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', width: '300px' }}>
-                    <option value="Inter, sans-serif">Inter</option>
-                    <option value="Roboto, sans-serif">Roboto</option>
-                    <option value="Outfit, sans-serif">Outfit</option>
-                    <option value="Poppins, sans-serif">Poppins</option>
-                    <option value="DM Sans, sans-serif">DM Sans</option>
-                    <option value="Georgia, serif">Georgia (Serif)</option>
-                </select>
+            <div style={{ marginBottom: '32px', display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                <div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>Font Family</h3>
+                    <select value={theme.font} onChange={e => setTheme(p => ({ ...p, font: e.target.value }))}
+                        style={{ padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', width: '250px' }}>
+                        <option value="Inter, sans-serif">Inter</option>
+                        <option value="Roboto, sans-serif">Roboto</option>
+                        <option value="Outfit, sans-serif">Outfit</option>
+                        <option value="Poppins, sans-serif">Poppins</option>
+                        <option value="DM Sans, sans-serif">DM Sans</option>
+                        <option value="Georgia, serif">Georgia (Serif)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>Border Radius</h3>
+                    <select value={theme.borderRadius || '8px'} onChange={e => setTheme(p => ({ ...p, borderRadius: e.target.value }))}
+                        style={{ padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', width: '180px' }}>
+                        <option value="0px">Sharp (0px)</option>
+                        <option value="6px">Medium (6px)</option>
+                        <option value="12px">Rounded (12px)</option>
+                        <option value="20px">Extra Rounded (20px)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>Shadow Style</h3>
+                    <select value={theme.shadow || 'soft'} onChange={e => setTheme(p => ({ ...p, shadow: e.target.value }))}
+                        style={{ padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', width: '180px' }}>
+                        <option value="flat">Flat (None)</option>
+                        <option value="soft">Soft & Modern</option>
+                        <option value="glass">Glassmorphic Shadow</option>
+                    </select>
+                </div>
             </div>
 
             {/* Preview */}
-            <div style={{ marginBottom: '32px', padding: '32px', borderRadius: '16px', backgroundColor: theme.background, color: theme.text, border: '1px solid #e2e8f0' }}>
+            <div style={{ marginBottom: '32px', padding: '32px', borderRadius: theme.borderRadius || '8px', backgroundColor: theme.background, color: theme.text, border: '1px solid #e2e8f0', boxShadow: theme.shadow === 'glass' ? '0 8px 32px 0 rgba(31,38,135,0.08)' : theme.shadow === 'flat' ? 'none' : '0 10px 25px -5px rgba(0,0,0,0.05)' }}>
                 <h3 style={{ fontFamily: theme.font, fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>Theme Preview</h3>
-                <p style={{ fontFamily: theme.font, color: theme.secondary, marginBottom: '16px' }}>This is how your site will look with these colors.</p>
+                <p style={{ fontFamily: theme.font, color: theme.secondary, marginBottom: '16px' }}>This is how your site will look with these styles.</p>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                    <button style={{ padding: '10px 24px', borderRadius: '8px', border: 'none', backgroundColor: theme.primary, color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Primary</button>
-                    <button style={{ padding: '10px 24px', borderRadius: '8px', border: 'none', backgroundColor: theme.accent, color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Accent</button>
+                    <button style={{ padding: '10px 24px', borderRadius: theme.borderRadius || '8px', border: 'none', backgroundColor: theme.primary, color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Primary</button>
+                    <button style={{ padding: '10px 24px', borderRadius: theme.borderRadius || '8px', border: 'none', backgroundColor: theme.accent, color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Accent</button>
                 </div>
             </div>
 

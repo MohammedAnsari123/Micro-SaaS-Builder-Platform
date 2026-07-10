@@ -17,7 +17,7 @@ exports.getTemplates = async (req, res, next) => {
         if (type) filter.type = type;
         if (category) filter.category = category;
 
-        const templates = await Template.find(filter).sort('-createdAt');
+        const templates = await Template.find(filter).sort('-createdAt').lean();
         res.status(200).json({ success: true, count: templates.length, data: templates });
     } catch (err) {
         console.error('getTemplates Error:', err);
@@ -31,7 +31,7 @@ exports.getTemplates = async (req, res, next) => {
 // @access  Public
 exports.getTemplateBySlug = async (req, res, next) => {
     try {
-        const template = await Template.findOne({ slug: req.params.slug, isPublic: true });
+        const template = await Template.findOne({ slug: req.params.slug, isPublic: true }).lean();
 
         if (!template) {
             return res.status(404).json({ success: false, message: 'Template not found' });
@@ -158,7 +158,8 @@ exports.getMyClones = async (req, res, next) => {
     try {
         const clones = await TemplateClone.find({ tenantId: req.tenantId })
             .populate('templateId', 'name slug type category theme pages modules')
-            .sort('-clonedAt');
+            .sort('-clonedAt')
+            .lean();
 
         res.status(200).json({ success: true, count: clones.length, data: clones });
     } catch (err) {
@@ -174,7 +175,8 @@ exports.getMyClones = async (req, res, next) => {
 exports.getTenantSite = async (req, res, next) => {
     try {
         const tenant = await Tenant.findById(req.params.tenantId)
-            .populate('templateId', 'name slug type category pages modules theme');
+            .populate('templateId', 'name slug type category pages modules theme')
+            .lean();
 
         if (!tenant || !tenant.templateId) {
             return res.status(404).json({ success: false, message: 'Site not found' });
@@ -208,21 +210,21 @@ exports.resolveSite = async (req, res, next) => {
         // 1. Find user by email prefix
         const user = await User.findOne({
             email: { $regex: new RegExp(`^${emailPrefix}@`, 'i') }
-        });
+        }).lean();
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'Site owner not found' });
         }
 
         // 2. Find any tenant owned by user (to get tenantId)
-        const tenant = await Tenant.findOne({ ownerId: user._id });
+        const tenant = await Tenant.findOne({ ownerId: user._id }).lean();
         if (!tenant) {
             return res.status(404).json({ success: false, message: 'Site not found' });
         }
 
         // 3. Find the actual template by slug
         const Template = require('../models/Template');
-        const targetTemplate = await Template.findOne({ slug: templateSlug });
+        const targetTemplate = await Template.findOne({ slug: templateSlug }).lean();
         if (!targetTemplate) {
             return res.status(404).json({ success: false, message: 'Template not found' });
         }
@@ -241,7 +243,8 @@ exports.resolveSite = async (req, res, next) => {
 
         const clone = await TemplateClone.findOne(query)
             .populate('templateId', 'name slug type category pages modules theme')
-            .sort('-clonedAt');
+            .sort('-clonedAt')
+            .lean();
 
         if (!clone) {
             return res.status(404).json({ success: false, message: 'Site instance not found' });

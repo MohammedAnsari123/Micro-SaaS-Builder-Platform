@@ -1,20 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Lenis from '@studio-freight/lenis';
 
-// Pages
-import Landing from './pages/Landing';
-import DashboardOverview from './pages/DashboardOverview';
-import Tenants from './pages/Tenants';
-import Analytics from './pages/Analytics';
-import Subscriptions from './pages/Subscriptions';
-import GlobalSettings from './pages/GlobalSettings';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import TemplateGallery from './pages/TemplateGallery';
-import TemplatePreview from './pages/TemplatePreview';
-import PublicApp from './pages/PublicApp';
-import TenantAdminLayout from './pages/admin/TenantAdminLayout';
+// Loading fallback component
+const PageLoader = () => (
+  <div style={{
+    height: '100vh', width: '100%', display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+    color: '#fff'
+  }}>
+    <div style={{
+      width: '48px', height: '48px', borderRadius: '50%',
+      border: '3px solid rgba(59, 130, 246, 0.2)', borderTopColor: '#3b82f6',
+      animation: 'spin 1s linear infinite', marginBottom: '16px'
+    }}></div>
+    <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Loading Page</h2>
+    <p style={{ color: '#94a3b8', marginTop: '8px' }}>Please wait...</p>
+    <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+  </div>
+);
+
+// Lazy Loaded Pages
+const Landing = lazy(() => import('./pages/Landing'));
+const DashboardOverview = lazy(() => import('./pages/DashboardOverview'));
+const Tenants = lazy(() => import('./pages/Tenants'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Subscriptions = lazy(() => import('./pages/Subscriptions'));
+const GlobalSettings = lazy(() => import('./pages/GlobalSettings'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const TemplateGallery = lazy(() => import('./pages/TemplateGallery'));
+const TemplatePreview = lazy(() => import('./pages/TemplatePreview'));
+const PublicApp = lazy(() => import('./pages/PublicApp'));
+const TenantAdminLayout = lazy(() => import('./pages/admin/TenantAdminLayout'));
 
 // Components
 import Navbar from './components/layout/Navbar';
@@ -89,40 +108,42 @@ const AppContent = () => {
     <div className="min-h-screen bg-slate-900 text-white font-sans selection:bg-blue-500/30">
       {!isDashboard && <Navbar />}
       <main>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* User Dashboard Section */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <UserLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardOverview />} />
-            <Route path="/sites" element={<Tenants />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/subscriptions" element={<Subscriptions />} />
-            <Route path="/settings" element={<GlobalSettings />} />
-          </Route>
+            {/* User Dashboard Section */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <UserLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<DashboardOverview />} />
+              <Route path="/sites" element={<Tenants />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/settings" element={<GlobalSettings />} />
+            </Route>
 
-          <Route path="/templates" element={<TemplateGallery />} />
-          <Route path="/templatePreview/:slug" element={<TemplatePreview />} />
-          <Route path="/site/:templateName/:emailPrefix/:cloneId?" element={<PublicApp />} />
+            <Route path="/templates" element={<TemplateGallery />} />
+            <Route path="/templatePreview/:slug" element={<TemplatePreview />} />
+            <Route path="/site/:templateName/:emailPrefix/:cloneId?" element={<PublicApp />} />
 
-          {/* CMS Site Management (Tenant Admin) */}
-          <Route
-            path="/admin/manage/:cloneId?"
-            element={
-              <ProtectedRoute>
-                <TenantAdminLayout token={localStorage.getItem('token')} onLogout={() => { localStorage.removeItem('token'); window.location.href = '/login'; }} />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+            {/* CMS Site Management (Tenant Admin) */}
+            <Route
+              path="/admin/manage/:cloneId?"
+              element={
+                <ProtectedRoute>
+                  <TenantAdminLayout token={localStorage.getItem('token')} onLogout={() => { localStorage.removeItem('token'); window.location.href = '/login'; }} />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );

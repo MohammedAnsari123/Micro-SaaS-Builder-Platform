@@ -181,6 +181,38 @@ const templates = [
         ],
         modules: ['content', 'contact', 'product', 'order'],
         theme: { primary: '#059669', secondary: '#64748b', accent: '#14b8a6', background: '#f0fdf4', text: '#0f172a', font: 'Inter, sans-serif' },
+    },
+    {
+        name: 'Real Estate Showcase',
+        slug: 'real-estate',
+        category: 'Real Estate',
+        type: 'informational',
+        description: 'Premium real estate showcase with property lists, agent profiles, and dynamic messaging.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'highlights'] },
+            { name: 'Properties', slug: 'properties', icon: 'Building', sections: ['hero', 'featured_projects'] },
+            { name: 'Agents', slug: 'agents', icon: 'Users', sections: ['hero', 'team'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact'],
+        theme: { primary: '#1e3a8a', secondary: '#475569', accent: '#d97706', background: '#f8fafc', text: '#0f172a', font: 'Inter, sans-serif' },
+        version: 1,
+        isPublic: true
+    },
+    {
+        name: 'Medical Clinic Booking',
+        slug: 'medical-clinic',
+        category: 'Medical',
+        type: 'functional',
+        description: 'Medical clinic website with patient consulting registration, treatment list, and schedule booking.',
+        pages: [
+            { name: 'Home', slug: 'home', icon: 'Home', sections: ['hero', 'hours'] },
+            { name: 'Services', slug: 'services', icon: 'HeartPulse', sections: ['hero'] },
+            { name: 'Book Appointment', slug: 'book', icon: 'Calendar', sections: ['hero'] },
+            { name: 'Contact', slug: 'contact', icon: 'Mail', sections: ['hero', 'info'] }
+        ],
+        modules: ['content', 'contact', 'service', 'booking'],
+        theme: { primary: '#0d9488', secondary: '#4b5563', accent: '#2563eb', background: '#f0fdfa', text: '#0f172a', font: 'Inter, sans-serif' },
         version: 1,
         isPublic: true
     }
